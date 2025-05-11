@@ -1,5 +1,6 @@
 name: Check builds
 on:
+  push:
   schedule:
     # Randomly selected
     - cron: '14 20 * * *'
