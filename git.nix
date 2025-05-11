@@ -41,6 +41,12 @@ git.overrideAttrs (
       writeShellScript "update-git.sh" ''
         set -euo pipefail
 
+        commit=
+        if (( $# > 0 )) && [[ "$1" = -c ]]; then
+            commit=YesPlease
+            shift
+        fi
+
         if (( $# == 0 )); then
             remote_ref=refs/heads/next
         elif (( $# == 1 )); then
@@ -59,7 +65,12 @@ git.overrideAttrs (
 
         version="$(<"$store_path"/version)"
 
-        update-source-version git "$version" "$hash" --file="$PWD"/git.nix --rev="$rev"
+        cmd="$(update-source-version git "$version" "$hash" --file=git.nix --rev="$rev" --print-changes | jq -r '.[] | @sh "old_version=\(.oldVersion) new_version=\(.newVersion)"')"
+        eval "$cmd"
+
+        if [[ "$commit" ]]; then
+            git commit -m "git: $old_version -> $new_version" -- git.nix
+        fi
       '';
   in
   {
