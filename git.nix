@@ -66,9 +66,11 @@ git.overrideAttrs (
         version="$(<"$store_path"/version)"
 
         cmd="$(update-source-version git "$version" "$hash" --file=git.nix --rev="$rev" --print-changes | jq -r '.[] | @sh "old_version=\(.oldVersion) new_version=\(.newVersion)"')"
-        eval "$cmd"
 
-        if [[ "$commit" ]]; then
+        # Only anything to commit if cmd has contents, otherwise it's
+        # indicating the version hasn't changed.
+        if [[ "$commit" && "$cmd" ]]; then
+            eval "$cmd"
             git commit -m "git: $old_version -> $new_version" -- git.nix
         fi
       '';
