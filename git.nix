@@ -8,8 +8,12 @@
   common-updater-scripts,
   path,
   jq,
+  doInstallCheck ? null,
 }:
-git.overrideAttrs (
+let
+  git' = if doInstallCheck != null then git.override { inherit doInstallCheck; } else git;
+in
+git'.overrideAttrs (
   prevAttrs:
   let
     owner = "gitster";

@@ -13,12 +13,7 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        inherit (nixpkgs.lib)
-          concatMapAttrs
-          mapAttrs'
-          nameValuePair
-          filterAttrs
-          ;
+        inherit (nixpkgs.lib) mapAttrs;
         pkgs = import nixpkgs { inherit system; };
       in
       {
@@ -26,17 +21,9 @@
           default = self.packages."${system}".git;
         };
 
-        # For each package, build and reference everything in the
-        # package.passthru.tests attrset.
-        checks = concatMapAttrs (
-          pkgName: pkg:
-          mapAttrs' (testName: testDrv: nameValuePair (pkgName + " " + testName) testDrv) (
-            removeAttrs pkg.passthru.tests [
-              "override"
-              "overrideDerivation"
-            ]
-          )
-        ) self.packages."${system}";
+        # TODO Also run the fetchgit tests and similar with the new versions of
+        # the Git package.
+        checks = mapAttrs (name: pkg: pkg.override { doInstallCheck = true; }) self.packages."${system}";
 
         apps.updateScript = {
           type = "app";
