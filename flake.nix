@@ -15,6 +15,7 @@
       let
         inherit (nixpkgs.lib) mapAttrs;
         pkgs = import nixpkgs { inherit system; };
+        lib = pkgs.lib;
       in
       {
         packages = (import ./. { inherit pkgs; }) // {
@@ -23,7 +24,22 @@
 
         # TODO Also run the fetchgit tests and similar with the new versions of
         # the Git package.
-        checks = mapAttrs (name: pkg: pkg.override { doInstallCheck = true; }) self.packages."${system}";
+        checks =
+          let
+            packageChecks = mapAttrs (_: v: v.override { doInstallCheck = true; }) (
+              removeAttrs self.packages."${system}" [ "default" ]
+            );
+            fetchgitChecks =
+              let
+                inherit (self.packages."${system}") git;
+                git-lfs = pkgs.git-lfs.override { inherit git; };
+                fetchgit = pkgs.fetchgit.override { inherit git git-lfs; };
+              in
+              mapAttrs (_: v: v.override { inherit fetchgit; }) (
+                lib.filterAttrs (_: v: lib.isDerivation v) pkgs.tests.fetchgit
+              );
+          in
+          packageChecks // fetchgitChecks;
 
         apps.updateScript = {
           type = "app";
