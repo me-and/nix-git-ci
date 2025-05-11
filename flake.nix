@@ -31,9 +31,14 @@
             );
             fetchgitChecks =
               let
-                inherit (self.packages."${system}") git;
+                inherit (self.packages."${system}") git gitMinimal;
                 git-lfs = pkgs.git-lfs.override { inherit git; };
-                fetchgit = pkgs.fetchgit.override { inherit git git-lfs; };
+                fetchgit = pkgs.fetchgit.override {
+                  inherit git-lfs;
+                  # fetchgit is defined in all-packages.nix with git as
+                  # gitMinimal.
+                  git = gitMinimal;
+                };
               in
               mapAttrs (_: v: v.override { inherit fetchgit; }) (
                 lib.filterAttrs (_: v: lib.isDerivation v) pkgs.tests.fetchgit
