@@ -1,32 +1,10 @@
 name: Check builds
-on:
-  push:
-  schedule:
-    # Randomly selected
-    - cron: '14 20 * * *'
+on: push
 
 jobs:
-  update-versions:
-    name: Update versions
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v17
-      - name: Update inputs
-        run: nix flake update --commit-lock-file
-      - name: Update Git version
-        run: nix run .#updateScript -- -c
-      - name: Push changes
-        run: git push
-
   # TODO Run on more platforms
   run-tests:
     name: Run tests
-    needs: [update-versions]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

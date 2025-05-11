@@ -1,0 +1,22 @@
+name: Update Git version
+on:
+  schedule:
+    # Randomly selected, 12 hours offset from updating the Flake
+    - cron: '14 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-versions:
+    name: Update Git
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v17
+      - name: Update Git version
+        run: nix run .#updateScript -- -c
+      - name: Push changes
+        run: git push
