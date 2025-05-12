@@ -60,7 +60,10 @@ git'.overrideAttrs (
             -c)   commit=YesPlease
                   shift
                   ;;
-            -c*)
+            -u)   url="$2"
+                  shift 2
+                  ;;
+            -c*|-u*)
                   set -- "-''${1: 1:1}" "-''${1: 2}" "''${@: 2}"
                   ;;
             --)   set_remote_ref "$2"
@@ -76,7 +79,7 @@ git'.overrideAttrs (
         export NIX_PATH=nixpkgs=${lib.escapeShellArg path}
         export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}
 
-        cmd="$(nix-prefetch-git --url https://github.com/${owner}/${repo} --rev "$remote_ref" --deepClone --fetch-submodules --name ${localSrcName} | jq -r '@sh "rev=\(.rev) hash=\(.hash) store_path=\(.path)"')"
+        cmd="$(nix-prefetch-git --url "$url" --rev "$remote_ref" --deepClone --fetch-submodules --name ${localSrcName} | jq -r '@sh "rev=\(.rev) hash=\(.hash) store_path=\(.path)"')"
         eval "$cmd"
 
         version="$(<"$store_path"/version)"
