@@ -24,12 +24,21 @@ git'.overrideAttrs (
       # Send stdout to stderr so our commands don't change expected nix output
       exec >&2
       set -euo pipefail
+      shopt -s extglob
       export PATH=${gitMinimal}/bin:"$PATH"
       cd "$1"
+
+      # Ordering matters here: the second `make` command will create a
+      # `version` file in the root of the repository containing the git-gui
+      # version, but we need that file to contain the Git version.
       make GIT-VERSION-FILE
       make -C git-gui TARDIR="$PWD" dist-version
-      . GIT-VERSION-FILE
-      echo "$GIT_VERSION" >version
+
+      version_file_contents="$(<GIT-VERSION-FILE)"
+      echo "''${version_file_contents##GIT_VERSION*( )=*( )}" >version
+
+      version_file_contents="$(<git-gui/GIT-VERSION-FILE)"
+      echo "''${version_file_contents##GITGUI_VERSION*( )=*( )}" >git-gui/version
     '';
 
     preFetchHookCmd = "${preFetchScript} \"$dir\"";
@@ -103,7 +112,7 @@ git'.overrideAttrs (
       deepClone = true;
       leaveDotGit = false;
       preFetch = "export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}";
-      hash = "sha256-4ErZI87g5ONMLivOmCD14Q+CR6v5cnCVFiIygAWATXg=";
+      hash = "sha256-cY9hY/G8/2Weg262oMcretVDfTUNLBuJjFWZhRdDl7o=";
     };
 
     version = "2.49.0.1101.gccaa498523";
