@@ -102,9 +102,9 @@ git'.overrideAttrs (
     postInstall =
       builtins.replaceStrings
         [
-          "ln -s $out/share/git/contrib/completion/git-completion.bash $out/share/bash-completion/completions/git"
+          "\nln -s $out/share/git/contrib/completion/git-completion.bash $out/share/bash-completion/completions/git\n"
         ]
-        [ "" ]
+        [ "\n" ]
         prevAttrs.postInstall;
   }
 )
