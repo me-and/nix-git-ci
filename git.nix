@@ -99,11 +99,11 @@ git'.overrideAttrs (
       inherit owner repo;
       name = localSrcName;
       rev = "ccaa498523280e6ffb126e4837a8963c255233f3";
-      fetchSubmodules = true;
+      fetchSubmodules = false;
       deepClone = true;
       leaveDotGit = false;
       preFetch = "export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}";
-      hash = "sha256-J7vZxJ0bSkvWWOvtraOxHRDVqV+C5dFe77IP5sgR3DI=";
+      hash = "sha256-4ErZI87g5ONMLivOmCD14Q+CR6v5cnCVFiIygAWATXg=";
     };
 
     version = "2.49.0.1101.gccaa498523";
