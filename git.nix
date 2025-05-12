@@ -25,14 +25,14 @@ git'.overrideAttrs (
       exec >&2
       set -euo pipefail
       export PATH=${gitMinimal}/bin:"$PATH"
-      cd "$workdir"
+      cd "$1"
       make GIT-VERSION-FILE
       make -C git-gui TARDIR="$PWD" dist-version
       . GIT-VERSION-FILE
       echo "$GIT_VERSION" >version
     '';
 
-    preFetchHookCmd = "workdir=\"$dir\" ${preFetchScript}";
+    preFetchHookCmd = "${preFetchScript} \"$dir\"";
 
     updateScript =
       let
