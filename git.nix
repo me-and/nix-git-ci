@@ -45,20 +45,32 @@ git'.overrideAttrs (
       writeShellScript "update-git.sh" ''
         set -euo pipefail
 
-        commit=
-        if (( $# > 0 )) && [[ "$1" = -c ]]; then
-            commit=YesPlease
-            shift
-        fi
-
-        if (( $# == 0 )); then
-            remote_ref=refs/heads/next
-        elif (( $# == 1 )); then
+        set_remote_ref () {
+            if [[ -v remote_ref ]]; then
+                echo 'unexpected arguments' >&2
+                exit 64 # EX_USAGE
+            fi
             remote_ref="$1"
-        else
-            echo 'unexpected arguments' >&2
-            exit 64 # EX_USAGE
-        fi
+        }
+
+        commit=
+        url=https://github.com/${owner}/${repo}
+        while (( $# > 0 )); do
+            case "$1" in
+            -c)   commit=YesPlease
+                  shift
+                  ;;
+            -c*)
+                  set -- "-''${1: 1:1}" "-''${1: 2}" "''${@: 2}"
+                  ;;
+            --)   set_remote_ref "$2"
+                  shift 2
+                  ;;
+            *)    set_remote_ref "$1"
+                  shift
+                  ;;
+            esac
+        done
 
         export PATH=${lib.makeBinPath runtimeReqs}:"$PATH"
         export NIX_PATH=nixpkgs=${lib.escapeShellArg path}
