@@ -93,7 +93,7 @@ git'.overrideAttrs (
         export NIX_PATH=nixpkgs=${lib.escapeShellArg path}
         export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}
 
-        cmd="$(nix-prefetch-git --url "$url" --rev "$remote_ref" --deepClone --fetch-submodules --name ${localSrcName} | jq -r '@sh "rev=\(.rev) hash=\(.hash) store_path=\(.path)"')"
+        cmd="$(nix-prefetch-git --url "$url" --rev "$remote_ref" --deepClone --name ${localSrcName} | jq -r '@sh "rev=\(.rev) hash=\(.hash) store_path=\(.path)"')"
         eval "$cmd"
 
         version="$(<"$store_path"/version)"
