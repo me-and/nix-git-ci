@@ -13,9 +13,8 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        inherit (nixpkgs.lib) mapAttrs;
+        inherit (nixpkgs.lib) filterAttrs isDerivation mapAttrs;
         pkgs = import nixpkgs { inherit system; };
-        lib = pkgs.lib;
       in
       {
         packages = (import ./. { inherit pkgs; }) // {
@@ -39,7 +38,7 @@
                 };
               in
               mapAttrs (_: v: v.override { inherit fetchgit; }) (
-                lib.filterAttrs (_: v: lib.isDerivation v) pkgs.tests.fetchgit
+                filterAttrs (_: v: isDerivation v) pkgs.tests.fetchgit
               );
           in
           packageChecks // fetchgitChecks;
