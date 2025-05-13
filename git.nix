@@ -85,6 +85,10 @@ git'.overrideAttrs (
             esac
         done
 
+        if [[ ! -v remote_ref ]]; then
+            remote_ref=refs/heads/next
+        fi
+
         export PATH=${lib.makeBinPath runtimeReqs}:"$PATH"
         export NIX_PATH=nixpkgs=${lib.escapeShellArg path}
         export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}
