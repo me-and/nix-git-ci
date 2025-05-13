@@ -9,14 +9,19 @@ jobs:
   update-versions:
     name: Update Git
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.COMMIT_PUSH_PAT }}
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v17
       - name: Update Git version
+        env:
+          GIT_AUTHOR_EMAIL: actions@github.com
+          GIT_AUTHOR_NAME: GitHub Actions
+          GIT_COMMITTER_EMAIL: actions@github.com
+          GIT_COMMITTER_NAME: GitHub Actions
         run: nix run .#updateScript -- -c
       - name: Push changes
         run: git push
