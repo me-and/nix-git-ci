@@ -9,11 +9,11 @@ jobs:
   update-versions:
     name: Update Git
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.COMMIT_PUSH_PAT }}
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v17
       - name: Update Git version
