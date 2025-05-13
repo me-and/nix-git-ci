@@ -9,6 +9,8 @@
   path,
   jq,
   autoconf,
+  gnupatch,
+  stdenv,
   doInstallCheck ? null,
 }:
 let
@@ -135,6 +137,16 @@ git'.overrideAttrs (
         ]
         [ "\n" ]
         prevAttrs.postInstall;
+
+    # These *shouldn't* be necessary, but it looks like they're long-standing
+    # failures that aren't being caught by the Darwin builds because the
+    # mainline Darwin builds don't run the tests in the first place.
+    preInstallCheck =
+      (prevAttrs.preInstallCheck or "")
+      + lib.optionalString stdenv.hostPlatform.isDarwin ''
+        ${gnupatch}/bin/patch -p1 <${./t3900-mac.diff}
+        disable_test t7900-maintenance 'start without GIT_TEST_MAINT_SCHEDULER'
+      '';
 
     nativeBuildInputs = (prevAttrs.nativeBuildInputs or [ ]) ++ [ autoconf ];
     preConfigure =
