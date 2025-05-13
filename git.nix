@@ -136,16 +136,18 @@ git'.overrideAttrs (
         [ "\n" ]
         prevAttrs.postInstall;
 
-    nativeBuildInputs = (prevAttrs.nativeBuildInputs or []) ++ [autoconf];
-    preConfigure = ''
-      # Make the configure script using the same flags as for normal build
-      # steps.
-      local flagsArray=(
-          ''${enableParallelBuilding:+-j''${NIX_BUILD_CORES}}
-          SHELL="$SHELL"
-      )
-      concatTo flagsArray makeFlags makeFlagsArray buildFlags buildFlagsArray
-      make "''${flagsArray[@]}" configure
-    '' + (prevAttrs.preConfigure or "");
+    nativeBuildInputs = (prevAttrs.nativeBuildInputs or [ ]) ++ [ autoconf ];
+    preConfigure =
+      ''
+        # Make the configure script using the same flags as for normal build
+        # steps.
+        local flagsArray=(
+            ''${enableParallelBuilding:+-j''${NIX_BUILD_CORES}}
+            SHELL="$SHELL"
+        )
+        concatTo flagsArray makeFlags makeFlagsArray buildFlags buildFlagsArray
+        make "''${flagsArray[@]}" configure
+      ''
+      + (prevAttrs.preConfigure or "");
   }
 )
