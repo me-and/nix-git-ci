@@ -22,8 +22,6 @@
           default = self.packages."${system}".git;
         };
 
-        # TODO Also run the fetchgit tests and similar with the new versions of
-        # the Git package.
         checks =
           let
             packageChecks = mapAttrs (_: v: v.override { doInstallCheck = true; }) (
