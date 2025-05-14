@@ -2,7 +2,7 @@ name: Update Git version
 on:
   schedule:
     # Randomly selected, 12 hours offset from updating the Flake
-    - cron: '14 8 * * *'
+    - cron: '44 * * * *'
   workflow_dispatch:
 
 jobs:
