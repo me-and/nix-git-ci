@@ -114,15 +114,15 @@ git'.overrideAttrs (
     src = fetchFromGitHub {
       inherit owner repo;
       name = localSrcName;
-      rev = "0be31eac6b76f13a3571dd8a2ead4e5296625cb4";
+      rev = "a128411c76f198ba255c81c140d7ab23f1cc5b8d";
       fetchSubmodules = false;
       deepClone = true;
       leaveDotGit = false;
       preFetch = "export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}";
-      hash = "sha256-11swZSt+xHM3+UjnakOgTVyoF9/WgCmda318c+TPN4Y=";
+      hash = "sha256-2vRlMEDehvH1H1X5R/Ulj3WEIp9NTwmzcFqxcEAZtkc=";
     };
 
-    version = "2.49.0.1143.g0be31eac6b";
+    version = "2.49.0.1151.ga128411c76";
 
     passthru = (prevAttrs.passthru or { }) // {
       inherit preFetchScript updateScript;
