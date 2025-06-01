@@ -148,17 +148,21 @@ git'.overrideAttrs (
         disable_test t7900-maintenance 'start without GIT_TEST_MAINT_SCHEDULER'
       '';
 
-    nativeBuildInputs = (prevAttrs.nativeBuildInputs or [ ]) ++ [ autoconf ];
     preConfigure =
       ''
-        # Make the configure script using the same flags as for normal build
-        # steps.
-        local flagsArray=(
-            ''${enableParallelBuilding:+-j''${NIX_BUILD_CORES}}
-            SHELL="$SHELL"
+        # Use a subshell for the extra preconfigure steps to avoid changing the
+        # environment used for the rest of the Git build.
+        (
+            # Make the configure script using the same flags as for normal
+            # build steps.
+            local flagsArray=(
+                ''${enableParallelBuilding:+-j''${NIX_BUILD_CORES}}
+                SHELL="$SHELL"
+            )
+            export PATH="${autoconf}/bin''${PATH:+:$PATH}"
+            concatTo flagsArray makeFlags makeFlagsArray buildFlags buildFlagsArray
+            make "''${flagsArray[@]}" configure
         )
-        concatTo flagsArray makeFlags makeFlagsArray buildFlags buildFlagsArray
-        make "''${flagsArray[@]}" configure
       ''
       + (prevAttrs.preConfigure or "");
   }
