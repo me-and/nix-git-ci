@@ -38,7 +38,9 @@
                 };
               in
               mapAttrs (_: v: v.override { inherit fetchgit; }) (
-                filterAttrs (_: v: isDerivation v) pkgs.tests.fetchgit
+                # Excluding the fetchTags test per
+                # https://github.com/NixOS/nixpkgs/issues/412967
+                filterAttrs (n: v: (isDerivation v) && (n != "fetchTags")) pkgs.tests.fetchgit
               );
           in
           packageChecks // fetchgitChecks;
