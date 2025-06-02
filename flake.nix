@@ -55,7 +55,7 @@
 
         apps.updateScript = {
           type = "app";
-          program = "${self.packages."${system}".git.passthru.updateScript}";
+          program = "${self.packages."${system}".default.passthru.updateScript}";
         };
 
         formatter = pkgs.nixfmt-tree;
