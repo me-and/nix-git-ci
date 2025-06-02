@@ -14,7 +14,8 @@ let
       (
         { flavour, branch }:
         {
-          "${flavour}-${branch}" = makeGitFrom (builtins.getAttr flavour pkgs) branch;
+          "${flavour}-${builtins.replaceStrings [ "." ] [ "_" ] branch}" =
+            makeGitFrom (builtins.getAttr flavour pkgs) branch;
         }
       )
       {

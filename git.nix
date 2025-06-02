@@ -65,6 +65,7 @@ git'.overrideAttrs (
         ];
       in
       writeShellScript "update-git.sh" ''
+        set -x
         set -euo pipefail
 
         commit=
@@ -113,7 +114,7 @@ git'.overrideAttrs (
 
             version="$(<"$store_path"/version)"
 
-            cmd="$(update-source-version git-"$branch" "$version" "$hash" --file=versions.nix --rev="$rev" --print-changes | jq -r '.[] | @sh "old_version=\(.oldVersion) new_version=\(.newVersion)"')"
+            cmd="$(update-source-version git-"''${branch//./_}" "$version" "$hash" --file=versions.nix --rev="$rev" --print-changes | jq -r '.[] | @sh "old_version=\(.oldVersion) new_version=\(.newVersion)"')"
 
             # Only anything to commit if cmd has contents, otherwise it's
             # indicating the version hasn't changed.

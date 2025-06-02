@@ -22,8 +22,9 @@ let
   fetchgitCheckFn =
     branch:
     let
-      git = packages."git-${branch}";
-      gitMinimal = packages."gitMinimal-${branch}";
+      mungedBranch = builtins.replaceStrings [ "." ] [ "_" ] branch;
+      git = packages."git-${mungedBranch}";
+      gitMinimal = packages."gitMinimal-${mungedBranch}";
       git-lfs = pkgs.git-lfs.override { inherit git; };
       fetchgit = pkgs.fetchgit.override {
         inherit git-lfs;
@@ -32,7 +33,7 @@ let
         git = gitMinimal;
       };
     in
-    mapAttrs' (n: v: nameValuePair "${n}-${branch}" (v.override { inherit fetchgit; })) (
+    mapAttrs' (n: v: nameValuePair "${n}-${mungedBranch}" (v.override { inherit fetchgit; })) (
       filterAttrs (n: v: isDerivation v && n != "fetchTags") pkgs.tests.fetchgit
     );
   fetchgitChecks = mergeAttrsList (builtins.map fetchgitCheckFn branches);
