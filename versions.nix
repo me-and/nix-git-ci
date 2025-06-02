@@ -9,4 +9,9 @@
     hash = "sha256-/6+1o9wQGPjzMDSAROD3/6cCKPijrTJwcjv0D0uMa1c=";
     version = "2.50.0.rc0.46.g7014b55638";
   };
+  "maint-2.47" = {
+    rev = "e1fbebe347426ef7974dc2198f8a277b7c31c8fe";
+    hash = "sha256-h3nAt71GzT+g31Ww5hJXzlBV4Yiq8/otp2wJv0VwDaI=";
+    version = "2.47.2";
+  };
 }
