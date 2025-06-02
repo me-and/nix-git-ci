@@ -14,6 +14,7 @@
       system:
       let
         inherit (nixpkgs.lib) filterAttrs isDerivation mapAttrs;
+        attrSetLen = s: builtins.length (builtins.attrNames s);
         pkgs = import nixpkgs { inherit system; };
       in
       {
@@ -42,8 +43,12 @@
                 # https://github.com/NixOS/nixpkgs/issues/412967
                 filterAttrs (n: v: (isDerivation v) && (n != "fetchTags")) pkgs.tests.fetchgit
               );
+            allChecks = packageChecks // fetchgitChecks;
           in
-          packageChecks // fetchgitChecks;
+          # Ensure we don't have any overlappying names that mean the //
+          # operator has dropped some checks.
+          assert attrSetLen allChecks == attrSetLen packageChecks + attrSetLen fetchgitChecks;
+          allChecks;
 
         apps.updateScript = {
           type = "app";
