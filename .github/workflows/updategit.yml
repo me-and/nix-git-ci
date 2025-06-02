@@ -16,6 +16,10 @@ jobs:
           token: ${{ secrets.COMMIT_PUSH_PAT }}
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v17
+      - name: Set up Nix caching
+        uses: DeterminateSystems/magic-nix-cache-action@main
+        with:
+          source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-X64-Linux
       - name: Update Git version
         env:
           GIT_AUTHOR_EMAIL: actions@github.com
