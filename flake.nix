@@ -10,7 +10,10 @@
       nixpkgs,
       flake-utils,
     }:
-    flake-utils.lib.eachDefaultSystem (
+    {
+      passthru.self = self;
+    }
+    // flake-utils.lib.eachDefaultSystem (
       system:
       let
         inherit (nixpkgs.lib) filterAttrs isDerivation mapAttrs;
