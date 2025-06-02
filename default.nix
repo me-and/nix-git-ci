@@ -2,8 +2,25 @@
   pkgs ? import <nixpkgs> { },
 }:
 let
-  makeGitFrom = git: pkgs.callPackage ./git.nix { inherit git; };
+  makeGitFrom = git: branch: pkgs.callPackage ./git.nix { inherit git branch; };
+
+  gitFlavours = import ./packagenames.nix;
+
+  versionData = import ./versions.nix;
+  branches = builtins.attrNames versionData;
+
+  allPackages = pkgs.lib.attrsets.mergeAttrsList (
+    pkgs.lib.attrsets.mapCartesianProduct
+      (
+        { flavour, branch }:
+        {
+          "${flavour}-${branch}" = makeGitFrom (builtins.getAttr flavour pkgs) branch;
+        }
+      )
+      {
+        flavour = gitFlavours;
+        branch = branches;
+      }
+  );
 in
-pkgs.lib.genAttrs [ "git" "gitFull" "gitSVN" "gitMinimal" ] (
-  name: makeGitFrom (builtins.getAttr name pkgs)
-)
+allPackages // { default = allPackages.git-master; }

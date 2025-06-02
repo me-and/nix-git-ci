@@ -1,0 +1,6 @@
+[
+  "git"
+  "gitFull"
+  "gitSVN"
+  "gitMinimal"
+]

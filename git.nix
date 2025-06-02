@@ -12,9 +12,19 @@
   gnupatch,
   stdenv,
   doInstallCheck ? null,
+  rev ? null,
+  hash ? null,
+  version ? null,
+  branch ? "next",
 }:
 let
   git' = if doInstallCheck != null then git.override { inherit doInstallCheck; } else git;
+
+  versionData = import ./versions.nix;
+
+  rev' = if rev == null then versionData."${branch}".rev else rev;
+  hash' = if hash == null then versionData."${branch}".hash else hash;
+  version' = if version == null then versionData."${branch}".version else version;
 in
 git'.overrideAttrs (
   prevAttrs:
@@ -57,72 +67,76 @@ git'.overrideAttrs (
       writeShellScript "update-git.sh" ''
         set -euo pipefail
 
-        set_remote_ref () {
-            if [[ -v remote_ref ]]; then
-                echo 'unexpected arguments' >&2
-                exit 64 # EX_USAGE
-            fi
-            remote_ref="$1"
-        }
-
         commit=
         url=https://github.com/${owner}/${repo}
+        branches=()
+        explicit_branches=
         while (( $# > 0 )); do
             case "$1" in
-            -c)   commit=YesPlease
+            -c|--commit)
+                  commit=YesPlease
                   shift
                   ;;
-            -u)   url="$2"
+            -u|--url)
+                  url="$2"
                   shift 2
                   ;;
             -c*|-u*)
                   set -- "-''${1: 1:1}" "-''${1: 2}" "''${@: 2}"
                   ;;
-            --)   set_remote_ref "$2"
-                  shift 2
+            --url=*)
+                  set -- "''${1%%=*}" "''${1#*=}" "''${@: 2}"
                   ;;
-            *)    set_remote_ref "$1"
+            --)   shift
+                  branches+=("$@")
+                  explicit_branches=yes
+                  break
+                  ;;
+            *)    branches+=("$1")
+                  explicit_branches=yes
                   shift
                   ;;
             esac
         done
 
-        if [[ ! -v remote_ref ]]; then
-            remote_ref=refs/heads/next
+        if [[ -z "$explicit_branches" ]]; then
+            branches=(${lib.escapeShellArgs (builtins.attrNames versionData)})
         fi
 
         export PATH=${lib.makeBinPath runtimeReqs}:"$PATH"
         export NIX_PATH=nixpkgs=${lib.escapeShellArg path}
         export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}
 
-        cmd="$(nix-prefetch-git --url "$url" --rev "$remote_ref" --deepClone --name ${localSrcName} | jq -r '@sh "rev=\(.rev) hash=\(.hash) store_path=\(.path)"')"
-        eval "$cmd"
-
-        version="$(<"$store_path"/version)"
-
-        cmd="$(update-source-version git "$version" "$hash" --file=git.nix --rev="$rev" --print-changes | jq -r '.[] | @sh "old_version=\(.oldVersion) new_version=\(.newVersion)"')"
-
-        # Only anything to commit if cmd has contents, otherwise it's
-        # indicating the version hasn't changed.
-        if [[ "$commit" && "$cmd" ]]; then
+        for branch in "''${branches[@]}"; do
+            cmd="$(nix-prefetch-git --url "$url" --rev "refs/heads/$branch" --deepClone --name ${localSrcName} | jq -r '@sh "rev=\(.rev) hash=\(.hash) store_path=\(.path)"')"
             eval "$cmd"
-            git commit -m "git: $old_version -> $new_version" -- git.nix
-        fi
+
+            version="$(<"$store_path"/version)"
+
+            cmd="$(update-source-version git-"$branch" "$version" "$hash" --file=versions.nix --rev="$rev" --print-changes | jq -r '.[] | @sh "old_version=\(.oldVersion) new_version=\(.newVersion)"')"
+
+            # Only anything to commit if cmd has contents, otherwise it's
+            # indicating the version hasn't changed.
+            if [[ "$commit" && "$cmd" ]]; then
+                eval "$cmd"
+                git commit -m "git $branch: $old_version -> $new_version" -- versions.nix
+            fi
+        done
       '';
   in
   {
     src = fetchFromGitHub {
       inherit owner repo;
       name = localSrcName;
-      rev = "846fc57c9e4b739e87f307e88bdb8e68dace880c";
+      rev = rev';
       fetchSubmodules = false;
       deepClone = true;
       leaveDotGit = false;
       preFetch = "export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}";
-      hash = "sha256-6QyoR28Af6cWtZ/AMx8Rxr8rTK4Yidf1XdZCu2imAr0=";
+      hash = hash';
     };
 
-    version = "2.50.0.rc0.629.g846fc57c9e";
+    version = version';
 
     passthru = (prevAttrs.passthru or { }) // {
       inherit preFetchScript updateScript;
