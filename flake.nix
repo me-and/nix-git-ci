@@ -18,14 +18,14 @@
       let
         pkgs = import nixpkgs { inherit system; };
       in
-      {
+      rec {
         packages = import ./. { inherit pkgs; };
 
         checks = import ./checks.nix { inherit pkgs; };
 
         apps.updateScript = {
           type = "app";
-          program = "${self.packages."${system}".default.passthru.updateScript}";
+          program = "${packages.default.passthru.updateScript}";
         };
 
         formatter = pkgs.nixfmt-tree;
