@@ -1,13 +1,13 @@
 {
   next = {
-    rev = "846fc57c9e4b739e87f307e88bdb8e68dace880c";
-    hash = "sha256-6QyoR28Af6cWtZ/AMx8Rxr8rTK4Yidf1XdZCu2imAr0=";
-    version = "2.50.0.rc0.629.g846fc57c9e";
+    rev = "800a2b2222321e001201b36683e839050da67a47";
+    hash = "sha256-KhGbt+JviRTSxsC7Hd7z/KQXcLkESglveMtVWvzHE7c=";
+    version = "2.50.0.rc0.642.g800a2b2222";
   };
   master = {
-    rev = "7014b55638da979331baf8dc31c4e1d697cf2d67";
-    hash = "sha256-/6+1o9wQGPjzMDSAROD3/6cCKPijrTJwcjv0D0uMa1c=";
-    version = "2.50.0.rc0.46.g7014b55638";
+    rev = "b07857f7dcffee4d3b428df8dce6c9b49a57c9c1";
+    hash = "sha256-lXKDNm2zrFgLLAKTARWvjUamXU4+Iu0uMLGP+ZLOd2Y=";
+    version = "2.50.0.rc0.61.gb07857f7dc";
   };
   # TODO these are failing because the patches applied for the more recent
   # branches don't apply here.  Need to work out how to handle that, which might

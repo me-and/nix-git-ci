@@ -1,7 +1,7 @@
 name: Update Git version
 on:
   schedule:
-    # Randomly selected, 12 hours offset from updating the Flake
+    # Randomly selected, 30 minutes offset from updating the Flake
     - cron: '44 * * * *'
   workflow_dispatch:
 
