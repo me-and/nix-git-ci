@@ -65,7 +65,6 @@ git'.overrideAttrs (
         ];
       in
       writeShellScript "update-git.sh" ''
-        set -x
         set -euo pipefail
 
         commit=
