@@ -30,16 +30,21 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@main
         with:
           source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-ARM64-Linux
-      - name: Set up Nix caching (x86_64-darwin)
-        if: matrix.runner == 'macos-13'
-        uses: DeterminateSystems/magic-nix-cache-action@main
-        with:
-          source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-X64-macOS
       - name: Set up Nix caching (aarch64-darwin)
         if: matrix.runner == 'macos-latest'
         uses: DeterminateSystems/magic-nix-cache-action@main
         with:
           source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-ARM64-macOS
+
+# Caching on x86_64-darwin is broken per
+# https://github.com/jchw-forks/magic-nix-cache/commit/cd808d4ca7c51ba93b8e7447a8716a0144262288#r158954273
+#
+#      - name: Set up Nix caching (x86_64-darwin)
+#        if: matrix.runner == 'macos-13'
+#        uses: DeterminateSystems/magic-nix-cache-action@main
+#        with:
+#          source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-X64-macOS
+
       - name: Run checks
         run: nix flake check --keep-going
 
