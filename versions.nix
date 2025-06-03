@@ -1,8 +1,8 @@
 {
   next = {
-    rev = "800a2b2222321e001201b36683e839050da67a47";
-    hash = "sha256-KhGbt+JviRTSxsC7Hd7z/KQXcLkESglveMtVWvzHE7c=";
-    version = "2.50.0.rc0.642.g800a2b2222";
+    rev = "9c95f17f6471dac01c71b43d0c5b1729a3f60224";
+    hash = "sha256-eTWwb+mtKPUkaHGv/vD0Q71xlkiYr1g1VhCNGw2nqK0=";
+    version = "2.50.0.rc1.591.g9c95f17f64";
   };
   master = {
     rev = "0bd2d791cc9f745ebaedafc0e1cbebdebe41343e";
