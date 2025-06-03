@@ -72,6 +72,7 @@ git'.overrideAttrs (
         url=https://github.com/${owner}/${repo}
         branches=()
         explicit_branches=
+        local_ref_args=()
         while (( $# > 0 )); do
             case "$1" in
             -c|--commit)
@@ -82,10 +83,14 @@ git'.overrideAttrs (
                   url="$2"
                   shift 2
                   ;;
-            -c*|-u*)
+            -l|--local)
+                  local_ref_args+=(--reference "$2")
+                  shift 2
+                  ;;
+            -c*|-u*|-l*)
                   set -- "-''${1: 1:1}" "-''${1: 2}" "''${@: 2}"
                   ;;
-            --url=*)
+            --url=*|--local=*)
                   set -- "''${1%%=*}" "''${1#*=}" "''${@: 2}"
                   ;;
             --)   shift
@@ -108,12 +113,13 @@ git'.overrideAttrs (
         export NIX_PATH=nixpkgs=${lib.escapeShellArg path}
         export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}
 
-        if (( ''${#branches[*]} > 1 )); then
+        if (( ''${#branches[*]} > 1 )) || (( ''${#local_ref_args[*]} > 0 )); then
             # Create a local mirror of the remote repository, so we only need
-            # to get the remote repository once.
+            # to get the remote repository once, and/or we can make use of
+            # local copies of the repository.
             tmp_dir="$(mktemp -d)"
             trap 'rm -rf "$tmp_dir"' EXIT
-            git clone --mirror "$url" "$tmp_dir"
+            git clone --mirror "''${local_ref_args[@]}" "$url" "$tmp_dir"
             url="$tmp_dir"
         fi
 
