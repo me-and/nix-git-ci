@@ -5,9 +5,9 @@
     version = "2.50.0.rc0.642.g800a2b2222";
   };
   master = {
-    rev = "b07857f7dcffee4d3b428df8dce6c9b49a57c9c1";
-    hash = "sha256-lXKDNm2zrFgLLAKTARWvjUamXU4+Iu0uMLGP+ZLOd2Y=";
-    version = "2.50.0.rc0.61.gb07857f7dc";
+    rev = "0bd2d791cc9f745ebaedafc0e1cbebdebe41343e";
+    hash = "sha256-RHC+iIfa5asgsE7LC/AwxJnaU1E5z8BnyzjWhG/SDwY=";
+    version = "2.50.0.rc1";
   };
   # TODO these are failing because the patches applied for the more recent
   # branches don't apply here.  Need to work out how to handle that, which might
