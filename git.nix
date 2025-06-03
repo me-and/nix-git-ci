@@ -60,6 +60,7 @@ git'.overrideAttrs (
       let
         runtimeReqs = [
           nix-prefetch-git
+          gitMinimal
           jq
           common-updater-scripts
         ];
@@ -106,6 +107,15 @@ git'.overrideAttrs (
         export PATH=${lib.makeBinPath runtimeReqs}:"$PATH"
         export NIX_PATH=nixpkgs=${lib.escapeShellArg path}
         export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}
+
+        if (( ''${#branches[*]} > 1 )); then
+            # Create a local mirror of the remote repository, so we only need
+            # to get the remote repository once.
+            tmp_dir="$(mktemp -d)"
+            trap 'rm -rf "$tmp_dir"' EXIT
+            git clone --mirror "$url" "$tmp_dir"
+            url="$tmp_dir"
+        fi
 
         for branch in "''${branches[@]}"; do
             cmd="$(nix-prefetch-git --url "$url" --rev "refs/heads/$branch" --deepClone --name ${localSrcName} | jq -r '@sh "rev=\(.rev) hash=\(.hash) store_path=\(.path)"')"
