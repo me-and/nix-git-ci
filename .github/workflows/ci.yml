@@ -29,9 +29,6 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v17
       - name: Set up Nix caching
-        # Caching on x86_64-darwin is broken per
-        # https://github.com/jchw-forks/magic-nix-cache/commit/cd808d4ca7c51ba93b8e7447a8716a0144262288#r158954273
-        if: matrix.system.runner != 'macos-13'
         uses: DeterminateSystems/magic-nix-cache-action@main
         with:
           source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-${{ matrix.system.cache-system }}
