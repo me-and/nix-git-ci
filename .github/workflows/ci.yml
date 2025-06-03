@@ -6,20 +6,41 @@ on:
 jobs:
   run-tests:
     name: Run tests
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.system.runner }}
     strategy:
       fail-fast: false
       matrix:
-        runner:
-          - ubuntu-latest    # x86_64-linux
-          - ubuntu-24.04-arm # aarch64-linux
-          - macos-13         # x86_64-darwin
-          - macos-latest     # aarch64-darwin
+        system:
+          - runner: ubuntu-latest
+            cache-system: X64-Linux
+            nix-system: x86_64-linux
+          - runner: ubuntu-24.04-arm
+            cache-system: ARM64-Linux
+            nix-system: aarch64-linux
+          - runner: macos-13
+            cache-system: X64-macOS
+            nix-system: x86_64-darwin
+          - runner: macos-latest
+            cache-system: ARM64-macOS
+            nix-system: aarch64-darwin
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v17
+      - name: Set up Nix caching
+        uses: DeterminateSystems/magic-nix-cache-action@main
+        with:
+          source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-${{ matrix.system.cache-system }}
+      - name: Check system
+        env:
+          TARGET_SYSTEM: ${{ matrix.system.nix-system }}
+        run: |
+          current_system="$(nix eval --impure --raw --expr builtins.currentSystem)"
+          if [[ "$current_system" != "$TARGET_SYSTEM" ]]; then
+              printf '::error title=System mismatch::Running on %s, expected %s\n' "$current_system" "$TARGET_SYSTEM"
+              exit 1
+          fi
       - name: Run checks
         run: nix flake check --keep-going
 
@@ -31,5 +52,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v17
+      - name: Set up Nix caching
+        uses: DeterminateSystems/magic-nix-cache-action@main
+        with:
+          source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-X64-Linux
       - name: Check formatting
         run: nix fmt -- --ci
