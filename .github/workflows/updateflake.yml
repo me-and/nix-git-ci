@@ -4,6 +4,8 @@ on:
     - cron: '14 * * * *'
   workflow_dispatch:
 
+concurrency: commit-${{ github.ref }}
+
 jobs:
   update-versions:
     name: Update Flake
