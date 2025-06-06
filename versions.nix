@@ -3,6 +3,15 @@
     rev = "fc6ec28a5d7844ff134d388edf5eb272d1cf11e9";
     hash = "sha256-QA8yDZU2HEM5DiYRDzD3nK2DGZuRyYnr9TvdfWjEk08=";
     version = "2.50.0.rc1.729.gfc6ec28a5d";
+    extraOverride = prevAttrs: {
+      patches = map (
+        p:
+        if baseNameOf p == "git-send-email-honor-PATH.patch" then
+          ./git-send-email-honor-PATH-fixed.patch
+        else
+          p
+      ) prevAttrs.patches;
+    };
   };
   master = {
     rev = "14de3eb34435db79c6e7edc8082c302a26a8330a";
