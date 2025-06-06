@@ -12,19 +12,14 @@
   gnupatch,
   stdenv,
   doInstallCheck ? null,
-  rev ? null,
-  hash ? null,
-  version ? null,
   branch ? "next",
 }:
 let
   git' = if doInstallCheck != null then git.override { inherit doInstallCheck; } else git;
 
   versionData = import ./versions.nix;
+  inherit (versionData."${branch}") rev hash version;
 
-  rev' = if rev == null then versionData."${branch}".rev else rev;
-  hash' = if hash == null then versionData."${branch}".hash else hash;
-  version' = if version == null then versionData."${branch}".version else version;
 in
 git'.overrideAttrs (
   prevAttrs:
@@ -141,18 +136,16 @@ git'.overrideAttrs (
       '';
   in
   {
+    inherit version;
+
     src = fetchFromGitHub {
-      inherit owner repo;
+      inherit owner repo rev hash;
       name = localSrcName;
-      rev = rev';
       fetchSubmodules = false;
       deepClone = true;
       leaveDotGit = false;
       preFetch = "export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg preFetchHookCmd}";
-      hash = hash';
     };
-
-    version = version';
 
     passthru = (prevAttrs.passthru or { }) // {
       inherit preFetchScript updateScript;
