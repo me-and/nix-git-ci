@@ -1,8 +1,8 @@
 {
   next = {
-    rev = "996102cc4f2356f8b1d719890c7fa8a01f2550f8";
-    hash = "sha256-ApA2ColN4aJUSQ2IK5DOwjkJ0bEN6K5G5GYdME+q9k4=";
-    version = "2.50.0.rc1.743.g996102cc4f";
+    rev = "56857d51d7a015fa5707ce6b86b5deb70eecb676";
+    hash = "sha256-hDl7vhVzI3nHVuOEW0jAN10pYVxp1gDjYW6zviNfvo0=";
+    version = "2.50.0.rc1.751.g56857d51d7";
     extraOverride = prevAttrs: {
       patches = map (
         p:
