@@ -14,9 +14,9 @@
     };
   };
   master = {
-    rev = "f1ca98f609f9a730b9accf24e5558a10a0b41b6c";
-    hash = "sha256-MvcAxAqZHBafEW5BTFawgNX6DhwRylxU3jg0/rfXaNQ=";
-    version = "2.50.0.rc2.48.gf1ca98f609";
+    rev = "16bd9f20a403117f2e0d9bcda6c6e621d3763e77";
+    hash = "sha256-vfEKFOeFSqFlKiI4xS3uAOjqR+79oTzneX3ymjSeEjA=";
+    version = "2.50.0";
   };
   # TODO these are failing because the patches applied for the more recent
   # branches don't apply here.  Need to work out how to handle that, which might
