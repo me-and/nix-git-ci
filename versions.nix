@@ -17,6 +17,15 @@
     rev = "f9aa0eedb37eb94d9d3711ef0d565fd7cb3b6148";
     hash = "sha256-PDaUJ7bhn1tKQk0ZMrYvPISdHRsgGWvgw086vOpNVFM=";
     version = "2.50.0.52.gf9aa0eedb3";
+    extraOverride = prevAttrs: {
+      patches = map (
+        p:
+        if baseNameOf p == "git-send-email-honor-PATH.patch" then
+          ./git-send-email-honor-PATH-fixed.patch
+        else
+          p
+      ) prevAttrs.patches;
+    };
   };
   # TODO these are failing because the patches applied for the more recent
   # branches don't apply here.  Need to work out how to handle that, which might
