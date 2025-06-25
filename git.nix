@@ -119,7 +119,16 @@ let
           fi
 
           for branch in "''${branches[@]}"; do
-              cmd="$(nix-prefetch-git --url "$url" --rev "refs/heads/$branch" --deepClone --name ${localSrcName} | jq -r '@sh "rev=\(.rev) hash=\(.hash) store_path=\(.path)"')"
+              if [[ "$branch" = *=* ]]; then
+                  # Allow specifying, say, master=3589aaa to specify what
+                  # commit should be used for the branch.
+                  rev="''${branch#*=}"
+                  branch="''${branch%%=*}"
+              else
+                  rev="refs/heads/$branch"
+              fi
+
+              cmd="$(nix-prefetch-git --url "$url" --rev "$rev" --deepClone --name ${localSrcName} | jq -r '@sh "rev=\(.rev) hash=\(.hash) store_path=\(.path)"')"
               eval "$cmd"
 
               version="$(<"$store_path"/version)"
