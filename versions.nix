@@ -44,6 +44,25 @@
         else
           p
       ) prevAttrs.patches;
+      # Bit of a hack to remove the bits I care about without rewriting the
+      # entire postInstall stage.
+      postInstall =
+        builtins.replaceStrings
+          [
+            "\nrm -r contrib/hooks/multimail"
+            "\nmkdir -p $out/share/git-core/contrib"
+            "\ncp -a contrib/hooks/ $out/share/git-core/contrib/"
+            "\nsubstituteInPlace $out/share/git-core/contrib/hooks/pre-auto-gc-battery \\"
+            "\n  --replace ' grep' ' /nix/store/"
+          ]
+          [
+            ""
+            ""
+            ""
+            ""
+            "\n# REMOVED FOR EXPEDIENCE"
+          ]
+          prevAttrs.postInstall;
     };
   };
   # TODO these are failing because the patches applied for the more recent
