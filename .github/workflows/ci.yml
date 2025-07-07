@@ -30,8 +30,6 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v18
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@main
-        with:
-          source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-${{ matrix.system.cache-system }}
       - name: Check system
         env:
           TARGET_SYSTEM: ${{ matrix.system.nix-system }}
@@ -54,7 +52,5 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v18
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@main
-        with:
-          source-url: https://github.com/jchw-forks/magic-nix-cache/releases/download/nightly/magic-nix-cache-X64-Linux
       - name: Check formatting
         run: nix fmt -- --ci
