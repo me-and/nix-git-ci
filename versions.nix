@@ -85,4 +85,9 @@
     hash = "sha256-ecHmWeLY74t2tIMuhKzANW2+oDPAqBMmPn7TsKqNKe4=";
     version = "2.49.1";
   };
+  "maint-2.50" = {
+    rev = "d82adb61ba2fd11d8f2587fca1b6bd7925ce4044";
+    hash = "sha256-pCt6GjGlVGF9TYM+eplgrNHP7/G0pXv/wKrbT8oZGg8=";
+    version = "2.50.1";
+  };
 }
