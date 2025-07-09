@@ -81,9 +81,9 @@
   #    version = "2.48.1";
   #  };
   "maint-2.49" = {
-    rev = "aadf8ae518afd80b73d49eff8aff475161aa5157";
-    hash = "sha256-ecHmWeLY74t2tIMuhKzANW2+oDPAqBMmPn7TsKqNKe4=";
-    version = "2.49.1";
+    rev = "47243eeed1749662e7c62d879d451a9383a25158";
+    hash = "sha256-YYq+XX/aP2nFxKDbE5INCgSMsp4DL00ROoQ7VqPzERE=";
+    version = "2.49.1.9.g47243eeed1";
   };
   "maint-2.50" = {
     rev = "d82adb61ba2fd11d8f2587fca1b6bd7925ce4044";
