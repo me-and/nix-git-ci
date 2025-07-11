@@ -65,21 +65,6 @@
           prevAttrs.postInstall;
     };
   };
-  # TODO these are failing because the patches applied for the more recent
-  # branches don't apply here.  Need to work out how to handle that, which might
-  # be something around using different nixpkgs versions corresponding to
-  # different maintenance branches.
-  #
-  #  "maint-2.47" = {
-  #    rev = "e1fbebe347426ef7974dc2198f8a277b7c31c8fe";
-  #    hash = "sha256-h3nAt71GzT+g31Ww5hJXzlBV4Yiq8/otp2wJv0VwDaI=";
-  #    version = "2.47.2";
-  #  };
-  #  "maint-2.48" = {
-  #    rev = "f93ff170b93a1782659637824b25923245ac9dd1";
-  #    hash = "sha256-W8eU04qSHy3j9Dg9inOQRtMtebW+T7BcpcCKhdikTow=";
-  #    version = "2.48.1";
-  #  };
   "maint-2.49" = {
     rev = "47243eeed1749662e7c62d879d451a9383a25158";
     hash = "sha256-YYq+XX/aP2nFxKDbE5INCgSMsp4DL00ROoQ7VqPzERE=";
