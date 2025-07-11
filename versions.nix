@@ -71,11 +71,6 @@ let
             prevAttrs.postInstall;
       };
     };
-    "maint-2.49" = {
-      rev = "47243eeed1749662e7c62d879d451a9383a25158";
-      hash = "sha256-YYq+XX/aP2nFxKDbE5INCgSMsp4DL00ROoQ7VqPzERE=";
-      version = "2.49.1.9.g47243eeed1";
-    };
     "maint-2.50" = {
       rev = "f368df439b31b422169975cc3c95f7db6a46eada";
       hash = "sha256-Up7l/879PSvA8ntpjdnmBUefK3l/B8rQi+qvGiS50iU=";
