@@ -71,32 +71,32 @@ let
           while (( $# > 0 )); do
               case "$1" in
               -c|--commit)
-                    commit=YesPlease
-                    shift
-                    ;;
+                  commit=YesPlease
+                  shift
+                  ;;
               -u|--url)
-                    url="$2"
-                    shift 2
-                    ;;
+                  url="$2"
+                  shift 2
+                  ;;
               -l|--local)
-                    local_ref_args+=(--reference "$2")
-                    shift 2
-                    ;;
+                  local_ref_args+=(--reference "$2")
+                  shift 2
+                  ;;
               -c*|-u*|-l*)
-                    set -- "-''${1: 1:1}" "-''${1: 2}" "''${@: 2}"
-                    ;;
+                  set -- "-''${1: 1:1}" "-''${1: 2}" "''${@: 2}"
+                  ;;
               --url=*|--local=*)
-                    set -- "''${1%%=*}" "''${1#*=}" "''${@: 2}"
-                    ;;
-              --)   shift
-                    branches+=("$@")
-                    explicit_branches=yes
-                    break
-                    ;;
-              *)    branches+=("$1")
-                    explicit_branches=yes
-                    shift
-                    ;;
+                  set -- "''${1%%=*}" "''${1#*=}" "''${@: 2}"
+                  ;;
+              --) shift
+                  branches+=("$@")
+                  explicit_branches=yes
+                  break
+                  ;;
+              *)  branches+=("$1")
+                  explicit_branches=yes
+                  shift
+                  ;;
               esac
           done
 
