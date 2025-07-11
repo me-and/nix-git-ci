@@ -66,6 +66,36 @@ let
         writeShellScript "update-git.sh" ''
           set -euo pipefail
 
+          help () {
+              cat <<'EOF'
+          update-git.sh [-c] [-u <url>] [-l <path>] [--] [<branch>...]
+
+          Update the version information for the various Git branches built in
+          the nix-git-ci repository.
+
+          -h, --help:
+              Print this help message.
+
+          -c, --commit:
+              Create commits for any updated branches.
+
+          -u <url>, --url=<url>:
+              Clone from the specified Git repository rather than the default
+              `https://github.com/${owner}/${repo}`.
+
+          -l <path>, --local=<path>:
+              When cloning the Git repository, include the specified path using
+              the `--reference` argument to `git clone`.  This can speed up the
+              cloning process by reducing the number of objects Git needs to
+              download from the remote repository.
+
+          <branch>:
+              When branches are specified on the command line, only the given
+              branches will be updated.  If no branches are specified, all
+              branches in versions.nix will be updated.
+          EOF
+          }
+
           commit=
           url=https://github.com/${owner}/${repo}
           branches=()
@@ -73,33 +103,37 @@ let
           local_ref_args=()
           while (( $# > 0 )); do
               case "$1" in
+              -h|--help)
+                  help
+                  exit 0
+                  ;;
               -c|--commit)
-                    commit=YesPlease
-                    shift
-                    ;;
+                  commit=YesPlease
+                  shift
+                  ;;
               -u|--url)
-                    url="$2"
-                    shift 2
-                    ;;
+                  url="$2"
+                  shift 2
+                  ;;
               -l|--local)
-                    local_ref_args+=(--reference "$2")
-                    shift 2
-                    ;;
+                  local_ref_args+=(--reference "$2")
+                  shift 2
+                  ;;
               -c*|-u*|-l*)
-                    set -- "-''${1: 1:1}" "-''${1: 2}" "''${@: 2}"
-                    ;;
+                  set -- "-''${1: 1:1}" "-''${1: 2}" "''${@: 2}"
+                  ;;
               --url=*|--local=*)
-                    set -- "''${1%%=*}" "''${1#*=}" "''${@: 2}"
-                    ;;
-              --)   shift
-                    branches+=("$@")
-                    explicit_branches=yes
-                    break
-                    ;;
-              *)    branches+=("$1")
-                    explicit_branches=yes
-                    shift
-                    ;;
+                  set -- "''${1%%=*}" "''${1#*=}" "''${@: 2}"
+                  ;;
+              --) shift
+                  branches+=("$@")
+                  explicit_branches=yes
+                  break
+                  ;;
+              *)  branches+=("$1")
+                  explicit_branches=yes
+                  shift
+                  ;;
               esac
           done
 

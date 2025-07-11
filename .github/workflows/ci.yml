@@ -40,6 +40,7 @@ jobs:
               exit 1
           fi
       - name: Run checks
+        timeout-minutes: 345
         run: nix flake check --keep-going
 
   check-fmt:
