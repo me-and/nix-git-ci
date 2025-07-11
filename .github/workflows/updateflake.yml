@@ -4,6 +4,11 @@ on:
     - cron: '14 * * * *'
   workflow_dispatch:
 
+# For FlakeHub access
+permissions:
+  id-token: write
+  contents: read
+
 concurrency: commit-${{ github.ref }}
 
 jobs:
