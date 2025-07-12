@@ -1,8 +1,10 @@
 {
   pkgs ? import <nixpkgs> { },
+  channel ? null,
 }:
 let
-  inherit (pkgs.lib)
+  inherit (pkgs) lib;
+  inherit (lib)
     mapAttrs
     mapAttrs'
     nameValuePair
@@ -10,13 +12,13 @@ let
     mergeAttrsList
     isDerivation
     ;
-  inherit (pkgs.lib.attrsets) unionOfDisjoint;
+  inherit (lib.attrsets) unionOfDisjoint;
 
-  packages = import ./. { inherit pkgs; };
+  packages = import ./. { inherit pkgs channel; };
 
   packageChecks = mapAttrs (_: v: v.override { doInstallCheck = true; }) packages;
 
-  versionData = import ./versions.nix;
+  versionData = import ./versions.nix { inherit lib channel; };
   branches = builtins.attrNames versionData;
 
   fetchgitCheckFn =

@@ -1,16 +1,20 @@
 {
   pkgs ? import <nixpkgs> { },
+  channel ? null,
 }:
 let
+  inherit (pkgs) lib;
+
   makeGitFrom = git: branch: pkgs.callPackage ./git.nix { inherit git branch; };
 
   gitFlavours = import ./packagenames.nix;
 
-  versionData = import ./versions.nix;
+  versionData = import ./versions.nix { inherit lib channel; };
+
   branches = builtins.attrNames versionData;
 
-  allPackages = pkgs.lib.attrsets.mergeAttrsList (
-    pkgs.lib.attrsets.mapCartesianProduct
+  allPackages = lib.attrsets.mergeAttrsList (
+    lib.attrsets.mapCartesianProduct
       (
         { flavour, branch }:
         {

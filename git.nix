@@ -17,7 +17,10 @@
 let
   git' = if doInstallCheck != null then git.override { inherit doInstallCheck; } else git;
 
-  versionData = import ./versions.nix;
+  # Note this must not filter the branch names, since the update script should
+  # update all the branches regardless of what might be built for this system /
+  # branch / nixpkgs combination.
+  versionData = import ./versions.nix { };
   inherit (versionData."${branch}") rev hash version;
   extraOverride = versionData."${branch}".extraOverride or { };
 
