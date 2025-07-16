@@ -72,7 +72,6 @@ jobs:
           CHANNEL: ${{ matrix.channel }}
           TARGET_SYSTEM: ${{ matrix.arch }}-${{ matrix.os }}
         run: |
-          nix flake check --no-build
           tmpdir="$(mktemp -d)"
           nix eval --json --apply builtins.attrNames .#checks."$TARGET_SYSTEM" >"$tmpdir"/checkattrs
           # Escaping here based on lib.strings.escapeNixIdentifier
@@ -91,7 +90,7 @@ jobs:
           nix build --stdin --keep-going <"$tmpdir"/checktargets
 
   check-fmt:
-    name: Check formatting
+    name: Check formatting and evaluation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -102,3 +101,5 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Check formatting
         run: nix fmt -- --ci
+      - name: Check evaluation
+        run: nix flake check --no-build --all-systems --keep-going
