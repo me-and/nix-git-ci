@@ -6,23 +6,50 @@ on:
 jobs:
   run-tests:
     name: Run tests
-    runs-on: ${{ matrix.system.runner }}
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        system:
-          - runner: ubuntu-latest
+        arch:
+          - x86_64
+          - aarch64
+        os:
+          - linux
+          - darwin
+        channel:
+          - nixpkgs-unstable
+          - nixos-unstable
+          - nixos-stable
+          - nixpkgs-stable-darwin
+
+        # Define architecture values according to the runner in use.
+        include:
+          - arch: x86_64
+            os: linux
+            runner: ubuntu-latest
             cache-system: X64-Linux
-            nix-system: x86_64-linux
-          - runner: ubuntu-24.04-arm
+          - arch: aarch64
+            os: linux
+            runner: ubuntu-24.04-arm
             cache-system: ARM64-Linux
-            nix-system: aarch64-linux
-          - runner: macos-13
+          - arch: x86_64
+            os: darwin
+            runner: macos-13
             cache-system: X64-macOS
-            nix-system: x86_64-darwin
-          - runner: macos-latest
+          - arch: aarch64
+            os: darwin
+            runner: macos-latest
             cache-system: ARM64-macOS
-            nix-system: aarch64-darwin
+
+        # Remore channel and system combinations that aren't useful.
+        exclude:
+          - os: linux
+            channel: nixpkgs-stable-darwin
+          - os: darwin
+            channel: nixos-unstable
+          - os: darwin
+            channel: nixos-stable
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +59,7 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Check system
         env:
-          TARGET_SYSTEM: ${{ matrix.system.nix-system }}
+          TARGET_SYSTEM: ${{ matrix.arch }}-${{ matrix.os }}
         run: |
           current_system="$(nix eval --impure --raw --expr builtins.currentSystem)"
           if [[ "$current_system" != "$TARGET_SYSTEM" ]]; then
@@ -41,7 +68,27 @@ jobs:
           fi
       - name: Run checks
         timeout-minutes: 345
-        run: nix flake check --keep-going
+        env:
+          CHANNEL: ${{ matrix.channel }}
+          TARGET_SYSTEM: ${{ matrix.arch }}-${{ matrix.os }}
+        run: |
+          nix flake check --no-build
+          tmpdir="$(mktemp -d)"
+          nix eval --json --apply builtins.attrNames .#checks."$TARGET_SYSTEM" >"$tmpdir"/checkattrs
+          # Escaping here based on lib.strings.escapeNixIdentifier
+          jq --raw-output '.[]
+              | select(endswith("-\($ENV.CHANNEL)"))
+              | ["checks", $ENV.TARGET_SYSTEM, .]
+              | map(
+                  if test("^[a-zA-Z_][a-zA-Z0-9_'\''-]*$")
+                  then .
+                  else @json | gsub("\\$"; "\\$")
+                  end
+                  )
+              | join(".")
+              | ".#" + .
+          ' >"$tmpdir"/checktargets <"$tmpdir"/checkattrs
+          nix build --stdin --keep-going <"$tmpdir"/checktargets
 
   check-fmt:
     name: Check formatting
