@@ -16,7 +16,7 @@ jobs:
         with:
           token: ${{ secrets.COMMIT_PUSH_PAT }}
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v18
+        uses: DeterminateSystems/nix-installer-action@v19
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Update inputs
