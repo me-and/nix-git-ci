@@ -6,9 +6,9 @@
 let
   allVersions = {
     next = {
-      rev = "074bbf1d35d2c7b5734afbda4e3d569305a93f57";
-      hash = "sha256-ehjKi1iwRM1cRwmlxALgDDz/GH9c6rJWl2wMGMjyJ1E=";
-      version = "2.50.1.619.g074bbf1d35";
+      rev = "393fa4b64b12da3d3fdcefb02739bb1e82291dcc";
+      hash = "sha256-AoHX4/0oS6qmoYIZ6gwmg+wtDFzVKKOm+s1OaMM8RSc=";
+      version = "2.50.1.661.g393fa4b64b";
       extraOverride = prevAttrs: {
         patches = map (
           p:
