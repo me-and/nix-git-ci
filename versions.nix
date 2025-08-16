@@ -10,13 +10,16 @@ let
       hash = "sha256-Or+1x+nGKJCvCRQfT0JytkOoQJICp1DgMm7oazVAHgw=";
       version = "2.51.0.rc2.237.gdddb2275d4";
       extraOverride = prevAttrs: {
-        patches = map (
-          p:
-          if baseNameOf p == "git-send-email-honor-PATH.patch" then
-            ./git-send-email-honor-PATH-fixed.patch
-          else
-            p
-        ) prevAttrs.patches;
+        patches =
+          (map (
+            p:
+            if baseNameOf p == "git-send-email-honor-PATH.patch" then
+              ./git-send-email-honor-PATH-fixed.patch
+            else
+              p
+          ) prevAttrs.patches)
+          # https://lore.kernel.org/git/20250816103656.1693607-1-adam@dinwoodie.org/
+          ++ [ ./t1517-installed.patch ];
         # Bit of a hack to remove the bits I care about without rewriting the
         # entire postInstall stage.
         postInstall =
