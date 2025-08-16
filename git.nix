@@ -212,6 +212,10 @@ let
           [ "\n" ]
           prevAttrs.postInstall;
 
+      # Don't leave .orig files just because the patch files didn't match
+      # perfectly.
+      patchFlags = "-p1 --no-backup-if-mismatch";
+
       # These *shouldn't* be necessary, but it looks like they're long-standing
       # failures that aren't being caught by the Darwin builds because the
       # mainline Darwin builds don't run the tests in the first place.
