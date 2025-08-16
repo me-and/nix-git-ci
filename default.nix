@@ -11,6 +11,13 @@ let
 
   versionData = import ./versions.nix { inherit lib channel; };
 
+  # Don't want to assume any particular version exists, so each version has a
+  # priority and we just set the default package to whichever one comes out on
+  # top.
+  highestPriorityVersion = builtins.head (
+    lib.sortOn (n: versionData."${n}".priority) (builtins.attrNames versionData)
+  );
+
   branches = builtins.attrNames versionData;
 
   allPackages = lib.attrsets.mergeAttrsList (
@@ -28,4 +35,4 @@ let
       }
   );
 in
-allPackages // { default = allPackages.git-master; }
+allPackages // { default = allPackages."git-${highestPriorityVersion}"; }

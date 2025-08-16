@@ -37,6 +37,7 @@ let
             ]
             prevAttrs.postInstall;
       };
+      priority = 2;
     };
     master = {
       rev = "e5ab6b3e5a3f0a94a429526e0fe6f491955ac053";
@@ -70,11 +71,13 @@ let
             ]
             prevAttrs.postInstall;
       };
+      priority = 1;
     };
     "maint-2.50" = {
       rev = "f368df439b31b422169975cc3c95f7db6a46eada";
       hash = "sha256-Up7l/879PSvA8ntpjdnmBUefK3l/B8rQi+qvGiS50iU=";
       version = "2.50.1.11.gf368df439b";
+      priority = 3;
     };
   };
 in
