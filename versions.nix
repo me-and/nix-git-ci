@@ -5,40 +5,39 @@
 }:
 let
   allVersions = {
-    # TODO Re-enable the next branch
-    # next = {
-    #   rev = "dddb2275d413451f7a01ff3f6c08fe0c6ce8f7b9";
-    #   hash = "sha256-Or+1x+nGKJCvCRQfT0JytkOoQJICp1DgMm7oazVAHgw=";
-    #   version = "2.51.0.rc2.237.gdddb2275d4";
-    #   extraOverride = prevAttrs: {
-    #     patches = map (
-    #       p:
-    #       if baseNameOf p == "git-send-email-honor-PATH.patch" then
-    #         ./git-send-email-honor-PATH-fixed.patch
-    #       else
-    #         p
-    #     ) prevAttrs.patches;
-    #     # Bit of a hack to remove the bits I care about without rewriting the
-    #     # entire postInstall stage.
-    #     postInstall =
-    #       builtins.replaceStrings
-    #         [
-    #           "\nrm -r contrib/hooks/multimail"
-    #           "\nmkdir -p $out/share/git-core/contrib"
-    #           "\ncp -a contrib/hooks/ $out/share/git-core/contrib/"
-    #           "\nsubstituteInPlace $out/share/git-core/contrib/hooks/pre-auto-gc-battery \\"
-    #           "\n  --replace ' grep' ' /nix/store/"
-    #         ]
-    #         [
-    #           ""
-    #           ""
-    #           ""
-    #           ""
-    #           "\n# REMOVED FOR EXPEDIENCE"
-    #         ]
-    #         prevAttrs.postInstall;
-    #   };
-    # };
+    next = {
+      rev = "dddb2275d413451f7a01ff3f6c08fe0c6ce8f7b9";
+      hash = "sha256-Or+1x+nGKJCvCRQfT0JytkOoQJICp1DgMm7oazVAHgw=";
+      version = "2.51.0.rc2.237.gdddb2275d4";
+      extraOverride = prevAttrs: {
+        patches = map (
+          p:
+          if baseNameOf p == "git-send-email-honor-PATH.patch" then
+            ./git-send-email-honor-PATH-fixed.patch
+          else
+            p
+        ) prevAttrs.patches;
+        # Bit of a hack to remove the bits I care about without rewriting the
+        # entire postInstall stage.
+        postInstall =
+          builtins.replaceStrings
+            [
+              "\nrm -r contrib/hooks/multimail"
+              "\nmkdir -p $out/share/git-core/contrib"
+              "\ncp -a contrib/hooks/ $out/share/git-core/contrib/"
+              "\nsubstituteInPlace $out/share/git-core/contrib/hooks/pre-auto-gc-battery \\"
+              "\n  --replace ' grep' ' /nix/store/"
+            ]
+            [
+              ""
+              ""
+              ""
+              ""
+              "\n# REMOVED FOR EXPEDIENCE"
+            ]
+            prevAttrs.postInstall;
+      };
+    };
     master = {
       rev = "e5ab6b3e5a3f0a94a429526e0fe6f491955ac053";
       hash = "sha256-zfWHTedPh83jrGyDyhtIfObv+moP55NWy6e1zuVDtLI=";
