@@ -19,7 +19,8 @@ let
               p
           ) prevAttrs.patches)
           # https://lore.kernel.org/git/20250816103656.1693607-1-adam@dinwoodie.org/
-          ++ [ ./t1517-installed.patch ];
+          # et seq
+          ++ [ ./t1517-installed.diff ];
         # Bit of a hack to remove the bits I care about without rewriting the
         # entire postInstall stage.
         postInstall =

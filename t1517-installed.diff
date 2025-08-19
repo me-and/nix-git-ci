@@ -1,0 +1,15 @@
+diff --git a/t/t1517-outside-repo.sh b/t/t1517-outside-repo.sh
+index 61fdd0170c..c824c1a25c 100755
+--- a/t/t1517-outside-repo.sh
++++ b/t/t1517-outside-repo.sh
+@@ -111,7 +111,9 @@ for cmd in $(git --list-cmds=main)
+ do
+ 	cmd=${cmd%.*} # strip .sh, .perl, etc.
+ 	case "$cmd" in
+-	archimport | citool | cvsexportcommit | cvsimport | cvsserver | daemon | \
++	archimport | citool | credential-netrc | credential-libsecret | \
++	credential-osxkeychain | cvsexportcommit | cvsimport | cvsserver | \
++	daemon | \
+ 	difftool--helper | filter-branch | fsck-objects | get-tar-commit-id | \
+ 	gui | gui--askpass | \
+ 	http-backend | http-fetch | http-push | init-db | \
