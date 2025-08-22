@@ -1,32 +1,30 @@
 {
   pkgs ? import <nixpkgs> { },
-  channel ? null,
+  lib ? pkgs.lib,
+  channelName,
+  updateScript,
 }:
 let
-  inherit (pkgs) lib;
-  inherit (lib)
-    mapAttrs
-    mapAttrs'
-    nameValuePair
-    filterAttrs
-    mergeAttrsList
-    isDerivation
-    ;
-  inherit (lib.attrsets) unionOfDisjoint;
+  gitPackages = import ./packages.nix {
+    inherit
+      pkgs
+      lib
+      channelName
+      updateScript
+      ;
+  };
 
-  packages = import ./. { inherit pkgs channel; };
+  packageChecks = lib.mapAttrs (_: v: v.overrideAttrs { doInstallCheck = true; }) gitPackages;
 
-  packageChecks = mapAttrs (_: v: v.override { doInstallCheck = true; }) packages;
-
-  versionData = import ./versions.nix { inherit lib channel; };
-  branches = builtins.attrNames versionData;
+  versionData = import ./versions.nix {
+    inherit pkgs lib channelName;
+  };
 
   fetchgitCheckFn =
-    branch:
+    versionData:
     let
-      mungedBranch = builtins.replaceStrings [ "." ] [ "_" ] branch;
-      git = packages."git-${mungedBranch}";
-      gitMinimal = packages."gitMinimal-${mungedBranch}";
+      git = gitPackages."git-${versionData.safeName}";
+      gitMinimal = gitPackages."gitMinimal-${versionData.safeName}";
       git-lfs = pkgs.git-lfs.override { inherit git; };
       fetchgit = pkgs.fetchgit.override {
         inherit git-lfs;
@@ -34,10 +32,15 @@ let
         # gitMinimal.
         git = gitMinimal;
       };
+
+      baseFetchgitChecks = lib.filterAttrs (_: v: lib.isDerivation v) pkgs.tests.fetchgit;
     in
-    mapAttrs' (n: v: nameValuePair "${n}-${mungedBranch}" (v.override { inherit fetchgit; })) (
-      filterAttrs (n: v: isDerivation v && n != "fetchTags") pkgs.tests.fetchgit
-    );
-  fetchgitChecks = mergeAttrsList (builtins.map fetchgitCheckFn branches);
+    lib.mapAttrs' (
+      n: v: lib.nameValuePair "${n}-${versionData.safeName}" (v.override { inherit fetchgit; })
+    ) baseFetchgitChecks;
+
+  fetchgitChecks = lib.mergeAttrsList (
+    builtins.map fetchgitCheckFn (builtins.attrValues versionData)
+  );
 in
-unionOfDisjoint packageChecks fetchgitChecks
+lib.attrsets.unionOfDisjoint packageChecks fetchgitChecks

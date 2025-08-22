@@ -1,10 +1,10 @@
 {
   pkgs ? import <nixpkgs> { },
   lib ? pkgs.lib,
-  channel ? null,
+  channelName ? null,
 }:
 let
-  allVersions = {
+  baseData = {
     next = {
       rev = "032396e0dae35802b404c2aba2b08cae8a518907";
       hash = "sha256-7MrkXirWEsZmUrdzFkSAXEk5ZNTYx8lfKPOmC9WJ5oU=";
@@ -121,7 +121,7 @@ let
     };
   };
 in
-if channel == null then
-  allVersions
+if channelName == null then
+  builtins.mapAttrs (n: v: throw "You should only be looking at the names!") baseData
 else
-  lib.filterAttrs (n: v: builtins.elem channel (v.channels or [ channel ])) allVersions
+  builtins.mapAttrs (n: v: v // { safeName = builtins.replaceStrings [ "." ] [ "_" ] n; }) baseData

@@ -14,32 +14,32 @@
       nixpkgs-unstable,
       ...
     }@inputs:
-    {
-      passthru.self = self;
-      passthru.inputs = inputs;
-    }
-    // flake-utils.lib.eachDefaultSystem (
+    flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs-unstable = import nixpkgs-unstable { inherit system; };
-        lib = pkgs-unstable.lib;
-
-        channels =
-          if lib.hasSuffix "-linux" system then
+        channelNames =
+          let
+            isType = type: (builtins.match ".*-${type}" system) == [ ];
+          in
+          if isType "linux" then
             [
               "nixpkgs-unstable"
               "nixos-unstable"
               "nixos-stable"
             ]
-          else if lib.hasSuffix "-darwin" system then
+          else if isType "darwin" then
             [
               "nixpkgs-unstable"
               "nixpkgs-stable-darwin"
             ]
           else
             throw "Unexpected system type ${system}";
+        topChannelName = builtins.head channelNames;
 
-        channelToPkgs = channel: import (builtins.getAttr channel inputs) { inherit system; };
+        channelToPkgs = channelName: import (builtins.getAttr channelName inputs) { inherit system; };
+
+        pkgs = channelToPkgs topChannelName;
+        inherit (pkgs) lib;
 
         # Combination of lib.attrsets.mergeAttrsList and
         # lib.attrsets.unionOfDisjoint: merge an arbitrary sized list of
@@ -50,37 +50,49 @@
       rec {
         packages =
           let
-            channelToPackages =
-              channel:
-              lib.mapAttrs' (n: v: lib.nameValuePair "${n}-${channel}" v) (
-                import ./. {
-                  inherit channel;
-                  pkgs = channelToPkgs channel;
+            channelToGitPackages =
+              channelName:
+              lib.mapAttrs' (n: v: lib.nameValuePair "${n}-${channelName}" v) (
+                import ./packages.nix {
+                  inherit channelName;
+                  pkgs = channelToPkgs channelName;
+                  updateScript = packages."updateScript-${channelName}";
                 }
               );
-            allPackages = mergeDisjoint (map channelToPackages channels);
+            allGitPackages = mergeDisjoint (map channelToGitPackages channelNames);
+
+            channelToUpdateScript = channelName: (channelToPkgs channelName).callPackage ./updater.nix { };
+
+            updateScriptPackages = lib.listToAttrs (
+              map (n: lib.nameValuePair "updateScript-${n}" (channelToUpdateScript n)) channelNames
+            );
           in
-          allPackages // { default = allPackages.default-nixpkgs-unstable; };
+          mergeDisjoint [
+            allGitPackages
+            updateScriptPackages
+            { default = allGitPackages."default-${topChannelName}"; }
+          ];
 
         checks =
           let
             channelToChecks =
-              channel:
-              lib.mapAttrs' (n: v: lib.nameValuePair "${n}-${channel}" v) (
+              channelName:
+              lib.mapAttrs' (n: v: lib.nameValuePair "${n}-${channelName}" v) (
                 import ./checks.nix {
-                  inherit channel;
-                  pkgs = channelToPkgs channel;
+                  inherit channelName;
+                  pkgs = channelToPkgs channelName;
+                  updateScript = packages."updateScript-${channelName}";
                 }
               );
           in
-          mergeDisjoint (map channelToChecks channels);
+          mergeDisjoint (map channelToChecks channelNames);
 
         apps.updateScript = {
           type = "app";
-          program = "${packages.default.passthru.updateScript}";
+          program = "${packages."updateScript-${topChannelName}"}/bin/update.sh";
         };
 
-        formatter = pkgs-unstable.nixfmt-tree;
+        formatter = pkgs.nixfmt-tree;
       }
     );
 }
