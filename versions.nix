@@ -52,7 +52,10 @@ let
       hash = "sha256-ukesKMAD9lQtDSL63l8kzFzLbyYOFy5gsJ8JdD60x5w=";
       version = "2.51.0.68.g954d33a975";
       extraOverride = prevAttrs: {
-        patches = map (
+        patches = [
+          ./t1517-test-installed.patch
+        ]
+        ++ map (
           p:
           if baseNameOf p == "git-send-email-honor-PATH.patch" then
             ./git-send-email-honor-PATH-fixed.patch
