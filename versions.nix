@@ -1,10 +1,10 @@
 {
   pkgs ? import <nixpkgs> { },
   lib ? pkgs.lib,
-  channel ? null,
+  channelName ? null,
 }:
 let
-  allVersions = {
+  baseData = {
     next = {
       rev = "d7df087d1abd30a578bb11da1d7fcc5f9bee7521";
       hash = "sha256-aLkpWgf1KdC8bwjK2bKCIXc7396kJpK9vSYiS1aYB2k=";
@@ -52,7 +52,10 @@ let
       hash = "sha256-197JlCqcbbi0YFaZymZvfgesuCuS1TVJ3oJOKF9RJJs=";
       version = "2.51.0.87.g1fa68948c3";
       extraOverride = prevAttrs: {
-        patches = map (
+        patches = [
+          ./t1517-test-installed.patch
+        ]
+        ++ map (
           p:
           if baseNameOf p == "git-send-email-honor-PATH.patch" then
             ./git-send-email-honor-PATH-fixed.patch
@@ -121,7 +124,7 @@ let
     };
   };
 in
-if channel == null then
-  allVersions
+if channelName == null then
+  builtins.mapAttrs (n: v: throw "You should only be looking at the names!") baseData
 else
-  lib.filterAttrs (n: v: builtins.elem channel (v.channels or [ channel ])) allVersions
+  builtins.mapAttrs (n: v: v // { safeName = builtins.replaceStrings [ "." ] [ "_" ] n; }) baseData
