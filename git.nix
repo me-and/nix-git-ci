@@ -3,7 +3,7 @@
   baseGit,
   versionData,
   fetchFromGitHub,
-  updateScript, # TODO Make sure this is the right thing
+  updateScript,
   autoconf,
   stdenv,
   gnupatch,

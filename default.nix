@@ -1,8 +1,8 @@
 {
   pkgs ? import <nixpkgs> { },
   lib ? pkgs.lib,
-  channelName,
-  updateScript,
+  channelName ? "nixpkgs-unstable",
+  updateScript ? pkgs.callPackage ./updater.nix { },
 }:
 let
   gitPackageNameData = import ./packagenames.nix {

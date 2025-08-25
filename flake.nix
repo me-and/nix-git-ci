@@ -53,7 +53,7 @@
             channelToGitPackages =
               channelName:
               lib.mapAttrs' (n: v: lib.nameValuePair "${n}-${channelName}" v) (
-                import ./packages.nix {
+                import ./. {
                   inherit channelName;
                   pkgs = channelToPkgs channelName;
                   updateScript = packages."updateScript-${channelName}";

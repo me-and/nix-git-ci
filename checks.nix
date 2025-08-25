@@ -5,7 +5,7 @@
   updateScript,
 }:
 let
-  gitPackages = import ./packages.nix {
+  gitPackages = import ./. {
     inherit
       pkgs
       lib
