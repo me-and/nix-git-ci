@@ -4,9 +4,34 @@ on:
   - pull_request
 
 jobs:
+  # This is only necessary to provide a sensible split of the builds so they
+  # all complete in time on Darwin.  Everything is quick enough everywhere
+  # else, but it's easiest to just do the same split across the board.
+  matrix-branches:
+    name: Decide build matrix branches
+    runs-on: ubuntu-latest
+    outputs:
+      matrix-branches: ${{ steps.matrix-branches.outputs.matrix-branches }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v19
+      - name: Set up Nix caching
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Define matrix branches
+        id: matrix-branches
+        run: |
+          {
+            printf 'matrix-branches='
+            nix eval --impure --apply builtins.attrNames --expr 'import ./versions.nix {}' --json |
+              jq -c 'map(gsub("\\."; "_"))'
+          } | tee -a "$GITHUB_OUTPUT"
+
   run-tests:
     name: Run tests
     runs-on: ${{ matrix.runner }}
+    needs: matrix-branches
     strategy:
       fail-fast: false
       matrix:
@@ -21,6 +46,7 @@ jobs:
           - nixos-unstable
           - nixos-stable
           - nixpkgs-stable-darwin
+        branch: ${{ fromJSON(needs.matrix-branches.outputs.matrix-branches) }}
 
         # Define architecture values according to the runner in use.
         include:
@@ -71,12 +97,13 @@ jobs:
         env:
           CHANNEL: ${{ matrix.channel }}
           TARGET_SYSTEM: ${{ matrix.arch }}-${{ matrix.os }}
+          BRANCH: ${{ matrix.branch }}
         run: |
           tmpdir="$(mktemp -d)"
           nix eval --json --apply builtins.attrNames .#checks."$TARGET_SYSTEM" >"$tmpdir"/checkattrs
           # Escaping here based on lib.strings.escapeNixIdentifier
           jq --raw-output '.[]
-              | select(endswith("-\($ENV.CHANNEL)"))
+              | select(endswith("-\($ENV.BRANCH)-\($ENV.CHANNEL)"))
               | ["checks", $ENV.TARGET_SYSTEM, .]
               | map(
                   if test("^[a-zA-Z_][a-zA-Z0-9_'\''-]*$")
