@@ -103,12 +103,7 @@ jobs:
           nix eval --json --apply builtins.attrNames .#checks."$TARGET_SYSTEM" >"$tmpdir"/checkattrs
           # Escaping here based on lib.strings.escapeNixIdentifier
           jq --raw-output '.[]
-              | select(endswith(
-                  if $ENV.BRANCH != ""
-                  then "-\($ENV.BRANCH)-\($ENV.CHANNEL)"
-                  else "-\($ENV.CHANNEL)"
-                  end
-                ))
+              | select(endswith("-\($ENV.BRANCH)-\($ENV.CHANNEL)"))
               | ["checks", $ENV.TARGET_SYSTEM, .]
               | map(
                   if test("^[a-zA-Z_][a-zA-Z0-9_'\''-]*$")
