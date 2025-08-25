@@ -11,11 +11,11 @@ jobs:
   #
   # This also needs to produce the "include" list that defines the architecture
   # values according to the runner in use.
-  matrix-includes:
-    name: Decide matrix includes
+  matrix-branches:
+    name: Decide build matrix branches
     runs-on: ubuntu-latest
     outputs:
-      matrix-includes: ${{ steps.matrix-includes.outputs.matrix-includes }}
+      matrix-branches: ${{ steps.matrix-branches.outputs.matrix-branches }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -24,50 +24,17 @@ jobs:
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Define matrix includes
-        id: matrix-includes
+        id: matrix-branches
         run: |
           {
-            printf 'matrix-includes='
-            nix eval --impure --apply builtins.attrNames --expr 'import ./versions.nix {}' --json |
-              jq -c '
-                [
-                  {
-                    arch: "x86_64",
-                    os: "linux",
-                    runner: "ubuntu-latest",
-                    "cache-system": "X64-Linux"
-                  },
-                  {
-                    arch: "aarch64",
-                    os: "linux",
-                    runner: "ubuntu-24.04-arm",
-                    "cache-system": "ARM64-Linux"
-                  }
-                ]
-                + [
-                  .[]
-                  | {
-                      arch: "x86_64",
-                      os: "darwin",
-                      runner: "macos-13",
-                      "cache-system": "X64-macOS",
-                      branch: .
-                    },
-                    {
-                      arch: "aarch64",
-                      os: "darwin",
-                      runner: "macos-latest",
-                      "cache-system": "ARM64-macOS",
-                      branch: .
-                    }
-                ]
-              '
+            printf 'matrix-branches='
+            nix eval --impure --apply builtins.attrNames --expr 'import ./versions.nix {}' --json
           } | tee -a "$GITHUB_OUTPUT"
 
   run-tests:
     name: Run tests
     runs-on: ${{ matrix.runner }}
-    needs: matrix-includes
+    needs: matrix-branches
     strategy:
       fail-fast: false
       matrix:
@@ -82,8 +49,26 @@ jobs:
           - nixos-unstable
           - nixos-stable
           - nixpkgs-stable-darwin
+        branch: ${{ fromJSON(needs.matrix-branches.outputs.matrix-branches) }}
 
-        include: ${{ fromJSON(needs.matrix-includes.outputs.matrix-includes) }}
+        # Define architecture values according to the runner in use.
+        include:
+          - arch: x86_64
+            os: linux
+            runner: ubuntu-latest
+            cache-system: X64-Linux
+          - arch: aarch64
+            os: linux
+            runner: ubuntu-24.04-arm
+            cache-system: ARM64-Linux
+          - arch: x86_64
+            os: darwin
+            runner: macos-13
+            cache-system: X64-macOS
+          - arch: aarch64
+            os: darwin
+            runner: macos-latest
+            cache-system: ARM64-macOS
 
         # Remore channel and system combinations that aren't useful.
         exclude:
