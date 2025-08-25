@@ -28,7 +28,8 @@ jobs:
         run: |
           {
             printf 'matrix-branches='
-            nix eval --impure --apply builtins.attrNames --expr 'import ./versions.nix {}' --json
+            nix eval --impure --apply builtins.attrNames --expr 'import ./versions.nix {}' --json |
+              jq -c 'map(gsub("\\."; "_"))'
           } | tee -a "$GITHUB_OUTPUT"
 
   run-tests:
