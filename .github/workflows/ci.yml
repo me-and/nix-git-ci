@@ -62,7 +62,7 @@ jobs:
                     }
                 ]
               '
-          } >>"$GITHUB_OUTPUT"
+          } | tee -a "$GITHUB_OUTPUT"
 
   run-tests:
     name: Run tests
