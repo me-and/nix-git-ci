@@ -6,9 +6,9 @@
 let
   baseData = {
     next = {
-      rev = "032396e0dae35802b404c2aba2b08cae8a518907";
-      hash = "sha256-7MrkXirWEsZmUrdzFkSAXEk5ZNTYx8lfKPOmC9WJ5oU=";
-      version = "2.51.0.308.g032396e0da";
+      rev = "d7df087d1abd30a578bb11da1d7fcc5f9bee7521";
+      hash = "sha256-aLkpWgf1KdC8bwjK2bKCIXc7396kJpK9vSYiS1aYB2k=";
+      version = "2.51.0.318.gd7df087d1a";
 
       # TODO Remove these once they're no longer included in any Nixpkgs
       # channel I care about building against.
@@ -48,9 +48,9 @@ let
       priority = 2;
     };
     master = {
-      rev = "954d33a9757fcfab723a824116902f1eb16e05f7";
-      hash = "sha256-ukesKMAD9lQtDSL63l8kzFzLbyYOFy5gsJ8JdD60x5w=";
-      version = "2.51.0.68.g954d33a975";
+      rev = "1fa68948c3d76328236cac73d2adf33c905bd8e3";
+      hash = "sha256-197JlCqcbbi0YFaZymZvfgesuCuS1TVJ3oJOKF9RJJs=";
+      version = "2.51.0.87.g1fa68948c3";
       extraOverride = prevAttrs: {
         patches = [
           ./t1517-test-installed.patch
