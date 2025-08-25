@@ -4,13 +4,9 @@ on:
   - pull_request
 
 jobs:
-  # The Darwin builds often overrun if I try to build everything as part of the
-  # same job.  This job works out a split of the packages that ensures
-  # everything is included and that the fetchgit tests run on the same system
-  # that builds them.
-  #
-  # This also needs to produce the "include" list that defines the architecture
-  # values according to the runner in use.
+  # This is only necessary to provide a sensible split of the builds so they
+  # all complete in time on Darwin.  Everything is quick enough everywhere
+  # else, but it's easiest to just do the same split across the board.
   matrix-branches:
     name: Decide build matrix branches
     runs-on: ubuntu-latest
@@ -23,7 +19,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v19
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@main
-      - name: Define matrix includes
+      - name: Define matrix branches
         id: matrix-branches
         run: |
           {
