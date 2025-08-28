@@ -48,9 +48,9 @@ let
       priority = 2;
     };
     master = {
-      rev = "f814da676ae46aac5be0a98b99373a76dee6cedb";
-      hash = "sha256-qLVzOwdSWjB1xdslOa6Waud9zoq5zasocPNUlJCiLEM=";
-      version = "2.51.0.122.gf814da676a";
+      rev = "42bc22449512d0a5ce43155d48ee6adf278adcda";
+      hash = "sha256-AcDFNwlwdYbOoN4nWid6dU7HjHB9Oczyqj7GpDskvE0=";
+      version = "2.51.0.140.g42bc224495";
       extraOverride = prevAttrs: {
         patches = [
           ./t1517-test-installed.patch
