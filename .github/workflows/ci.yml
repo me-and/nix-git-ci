@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v19
+        uses: DeterminateSystems/nix-installer-action@v20
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Define matrix branches
@@ -80,7 +80,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v19
+        uses: DeterminateSystems/nix-installer-action@v20
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Check system
@@ -123,7 +123,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v19
+        uses: DeterminateSystems/nix-installer-action@v20
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Check formatting
