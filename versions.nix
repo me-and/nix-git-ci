@@ -120,8 +120,17 @@ let
       priority = 4;
     };
   };
+
+  addSafeNames = builtins.mapAttrs (
+    n: v: v // { safeName = builtins.replaceStrings [ "." ] [ "_" ] n; }
+  );
 in
 if channelName == null then
   builtins.mapAttrs (n: v: throw "You should only be looking at the names!") baseData
+
+# Stop building maint-2.50 on unstable branches, as it's broken and
+# unnecessary.
+else if lib.hasSuffix "-unstable" channelName then
+  addSafeNames (lib.filterAttrs (n: v: n != "maint-2.50") baseData)
 else
-  builtins.mapAttrs (n: v: v // { safeName = builtins.replaceStrings [ "." ] [ "_" ] n; }) baseData
+  addSafeNames baseData
