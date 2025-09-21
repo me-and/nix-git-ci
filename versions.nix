@@ -18,13 +18,15 @@ let
       # these changes are necessary for nixpkgs-unstable, or at least they
       # won't be once the current staging branch is merged.
       extraOverride = prevAttrs: {
-        patches = map (
-          p:
-          if baseNameOf p == "git-send-email-honor-PATH.patch" then
-            ./git-send-email-honor-PATH-fixed.patch
-          else
-            p
-        ) prevAttrs.patches;
+        patches =
+          map (
+            p:
+            if baseNameOf p == "git-send-email-honor-PATH.patch" then
+              ./git-send-email-honor-PATH-fixed.patch
+            else
+              p
+          ) prevAttrs.patches
+          ++ [ ./t1517.diff ];
         # Bit of a hack to remove the bits I care about without rewriting the
         # entire postInstall stage.
         postInstall =
@@ -52,13 +54,15 @@ let
       hash = "sha256-NVmQPou7YpqLv2CwWNPN0ISgXxL9P4iqsPR2pZWeHg8=";
       version = "2.51.0.210.gab427cd991";
       extraOverride = prevAttrs: {
-        patches = map (
-          p:
-          if baseNameOf p == "git-send-email-honor-PATH.patch" then
-            ./git-send-email-honor-PATH-fixed.patch
-          else
-            p
-        ) prevAttrs.patches;
+        patches =
+          map (
+            p:
+            if baseNameOf p == "git-send-email-honor-PATH.patch" then
+              ./git-send-email-honor-PATH-fixed.patch
+            else
+              p
+          ) prevAttrs.patches
+          ++ [ ./t1517.diff ];
         # Bit of a hack to remove the bits I care about without rewriting the
         # entire postInstall stage.
         postInstall =
