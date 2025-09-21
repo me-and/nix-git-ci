@@ -29,6 +29,10 @@ nix-git-ci repository.
     When branches are specified on the command line, only the given branches
     will be updated.  If no branches are specified, all branches in
     versions.nix will be updated.
+
+    A branch name can be followed by `=<hash>` to specify that the given branch
+    should be updated to point to the specific revision rather than the current
+    tip of the branch.
 EOF
 }
 
