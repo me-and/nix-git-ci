@@ -1,8 +1,11 @@
 {
   pkgs ? import <nixpkgs> { },
   lib ? pkgs.lib,
-  channelName ? "nixpkgs-unstable",
   updateScript ? pkgs.callPackage ./updater.nix { },
+
+  # Special value "all" for channelName means to set things up to provide all
+  # possible packages, even if we know they won't build successfully.
+  channelName ? "all",
 }:
 let
   gitPackageNameData = import ./packagenames.nix {
