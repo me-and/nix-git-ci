@@ -1,6 +1,15 @@
 {
   pkgs ? import <nixpkgs> { },
   lib ? pkgs.lib,
+
+  # Channel name will be one of the following:
+  # - null, meaning we want the full list of branches we care about, but none
+  #   of them should evaluate.
+  # - "all", meaning we want the full list of branches and their corresponding
+  #   derivations, e.g. for use with the update-source-version script, but it's
+  #   fine for some derivations to fail to build.
+  # - A specific channel name string, in which case we want all the branches
+  #   and their corresponding derivations that we want to build.
   channelName ? null,
 }:
 let
