@@ -33,7 +33,12 @@ let
         git = gitMinimal;
       };
 
-      baseFetchgitChecks = lib.filterAttrs (_: v: lib.isDerivation v) pkgs.tests.fetchgit;
+      # TODO raise this bug: the underlying test doesn't work in pure
+      # evaluation mode.  Try `nix build nixpkgs#tests.fetchgit.withGitConfig`.
+      brokenTests = [ "withGitConfig" ];
+      baseFetchgitChecks = lib.filterAttrs (
+        n: v: !(builtins.elem n brokenTests) && lib.isDerivation v
+      ) pkgs.tests.fetchgit;
     in
     lib.mapAttrs' (
       n: v: lib.nameValuePair "${n}-${versionData.safeName}" (v.override { inherit fetchgit; })
