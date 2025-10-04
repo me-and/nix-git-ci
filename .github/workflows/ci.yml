@@ -60,7 +60,7 @@ jobs:
             cache-system: ARM64-Linux
           - arch: x86_64
             os: darwin
-            runner: macos-13
+            runner: macos-15-intel
             cache-system: X64-macOS
           - arch: aarch64
             os: darwin
