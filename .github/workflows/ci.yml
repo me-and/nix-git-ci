@@ -88,6 +88,7 @@ jobs:
               | join(".")
               | ".#" + .
           ' >"$tmpdir"/checktargets <"$tmpdir"/checkattrs
+          cat "$tmpdir"/checktargets
           nix build --stdin --keep-going <"$tmpdir"/checktargets
 
   run-linux-tests:
