@@ -59,9 +59,9 @@ let
       priority = 2;
     };
     master = {
-      rev = "4cf919bd7b946477798af5414a371b23fd68bf93";
-      hash = "sha256-cyKHPYcJea1rL+eEnYyHq4Rw5S5v7MTozEuPw2XCSnc=";
-      version = "2.52.0.rc0.28.g4cf919bd7b";
+      rev = "77b7284ccab768981a2cd08b6b2f164d91201e18";
+      hash = "sha256-J4zs8Al5Ri79e11DKhg9cDFCX1Qid2HLp0mdGdUmNek=";
+      version = "2.52.0.rc1";
       extraOverride = prevAttrs: {
         patches =
           map (
