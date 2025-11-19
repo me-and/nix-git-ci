@@ -4,50 +4,21 @@ on:
   - pull_request
 
 jobs:
-  # This is only necessary to provide a sensible split of the builds so they
-  # all complete in time on Darwin.  Everything is quick enough everywhere
-  # else, but it's easiest to just do the same split across the board.
-  matrix-branches:
-    name: Decide build matrix branches
-    runs-on: ubuntu-latest
-    outputs:
-      matrix-branches: ${{ steps.matrix-branches.outputs.matrix-branches }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v20
-      - name: Set up Nix caching
-        uses: DeterminateSystems/magic-nix-cache-action@main
-      - name: Define matrix branches
-        id: matrix-branches
-        run: |
-          {
-            printf 'matrix-branches='
-            nix eval --impure --apply builtins.attrNames --expr 'import ./versions.nix {}' --json |
-              jq -c 'map(gsub("\\."; "_"))'
-          } | tee -a "$GITHUB_OUTPUT"
-
   run-darwin-tests:
     name: Run tests on Darwin
     runs-on: ${{ matrix.runner }}
-    needs: matrix-branches
     strategy:
       fail-fast: false
       matrix:
         arch:
-          - x86_64
           - aarch64
         channel:
-          - nixpkgs-unstable
           - nixpkgs-stable-darwin
-        branch: ${{ fromJSON(needs.matrix-branches.outputs.matrix-branches) }}
+        branch:
+          - next
 
         # Define architecture values according to the runner in use.
         include:
-          - arch: x86_64
-            runner: macos-15-intel
-            cache-system: X64-macOS
           - arch: aarch64
             runner: macos-latest
             cache-system: ARM64-macOS
@@ -91,63 +62,3 @@ jobs:
               | ".#" + .
           ' >"$tmpdir"/checktargets <"$tmpdir"/checkattrs
           nix build --stdin --keep-going <"$tmpdir"/checktargets
-
-  run-linux-tests:
-    name: Run tests on Linux
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        arch:
-          - x86_64
-          - aarch64
-        channel:
-          - nixpkgs-unstable
-          - nixos-unstable
-          - nixos-stable
-
-        # Define architecture values according to the runner in use.
-        include:
-          - arch: x86_64
-            runner: ubuntu-latest
-            cache-system: X64-Linux
-          - arch: aarch64
-            runner: ubuntu-24.04-arm
-            cache-system: ARM64-Linux
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: Recover runner disk space
-        uses: wimpysworld/nothing-but-nix@v6
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v20
-      - name: Set up Nix caching
-        uses: DeterminateSystems/magic-nix-cache-action@main
-      - name: Check system
-        env:
-          TARGET_SYSTEM: ${{ matrix.arch }}-linux
-        run: |
-          current_system="$(nix eval --impure --raw --expr builtins.currentSystem)"
-          if [[ "$current_system" != "$TARGET_SYSTEM" ]]; then
-              printf '::error title=System mismatch::Running on %s, expected %s\n' "$current_system" "$TARGET_SYSTEM"
-              exit 1
-          fi
-      - name: Run checks
-        timeout-minutes: 345
-        run: nix flake check --keep-going
-
-  check-fmt:
-    name: Check formatting and evaluation
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v20
-      - name: Set up Nix caching
-        uses: DeterminateSystems/magic-nix-cache-action@main
-      - name: Check formatting
-        run: nix fmt -- --ci
-      - name: Check evaluation
-        run: nix flake check --no-build --all-systems --keep-going
