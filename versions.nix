@@ -15,9 +15,9 @@
 let
   baseData = {
     next = {
-      rev = "65b55ccf14e8c4913e145ca132790f29eed0b713";
-      hash = "sha256-nR+76PGIODYgFYbGU5Oq7bFx1d9YZfymKi+lJAH2zV4=";
-      version = "2.52.0.158.g65b55ccf14";
+      rev = "9f829587aff1b6c6d7a88078af6c6011bf5bcd19";
+      hash = "sha256-GeF5roNNOeVJJJq7ULTbIXHE1twQloj1/yyHiHNx6D4=";
+      version = "2.52.0.177.g9f829587af";
 
       # TODO Remove these once they're no longer included in any Nixpkgs
       # channel I care about building against.
