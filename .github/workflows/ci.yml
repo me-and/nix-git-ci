@@ -30,27 +30,15 @@ jobs:
 
   run-darwin-tests:
     name: Run tests on Darwin
-    runs-on: ${{ matrix.runner }}
+    runs-on: macos-latest
     needs: matrix-branches
     strategy:
       fail-fast: false
       matrix:
-        arch:
-          - x86_64
-          - aarch64
         channel:
           - nixpkgs-unstable
           - nixpkgs-stable-darwin
         branch: ${{ fromJSON(needs.matrix-branches.outputs.matrix-branches) }}
-
-        # Define architecture values according to the runner in use.
-        include:
-          - arch: x86_64
-            runner: macos-15-intel
-            cache-system: X64-macOS
-          - arch: aarch64
-            runner: macos-latest
-            cache-system: ARM64-macOS
 
     steps:
       - name: Checkout
@@ -60,11 +48,9 @@ jobs:
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Check system
-        env:
-          TARGET_SYSTEM: ${{ matrix.arch }}-darwin
         run: |
           current_system="$(nix eval --impure --raw --expr builtins.currentSystem)"
-          if [[ "$current_system" != "$TARGET_SYSTEM" ]]; then
+          if [[ "$current_system" != aarch64-darwin ]]; then
               printf '::error title=System mismatch::Running on %s, expected %s\n' "$current_system" "$TARGET_SYSTEM"
               exit 1
           fi
@@ -72,15 +58,14 @@ jobs:
         timeout-minutes: 345
         env:
           CHANNEL: ${{ matrix.channel }}
-          TARGET_SYSTEM: ${{ matrix.arch }}-darwin
           BRANCH: ${{ matrix.branch }}
         run: |
           tmpdir="$(mktemp -d)"
-          nix eval --json --apply builtins.attrNames .#checks."$TARGET_SYSTEM" >"$tmpdir"/checkattrs
+          nix eval --json --apply builtins.attrNames .#checks.aarch64-darwin >"$tmpdir"/checkattrs
           # Escaping here based on lib.strings.escapeNixIdentifier
           jq --raw-output '.[]
               | select(endswith("-\($ENV.BRANCH)-\($ENV.CHANNEL)"))
-              | ["checks", $ENV.TARGET_SYSTEM, .]
+              | ["checks", "aarch64-darwin", .]
               | map(
                   if test("^[a-zA-Z_][a-zA-Z0-9_'\''-]*$")
                   then .
@@ -110,10 +95,8 @@ jobs:
         include:
           - arch: x86_64
             runner: ubuntu-latest
-            cache-system: X64-Linux
           - arch: aarch64
             runner: ubuntu-24.04-arm
-            cache-system: ARM64-Linux
 
     steps:
       - name: Checkout
