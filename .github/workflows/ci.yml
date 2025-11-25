@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v20
+        uses: DeterminateSystems/nix-installer-action@v21
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Define matrix branches
@@ -44,7 +44,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v20
+        uses: DeterminateSystems/nix-installer-action@v21
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Check system
@@ -104,7 +104,7 @@ jobs:
       - name: Recover runner disk space
         uses: wimpysworld/nothing-but-nix@v6
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v20
+        uses: DeterminateSystems/nix-installer-action@v21
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Check system
@@ -127,7 +127,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v20
+        uses: DeterminateSystems/nix-installer-action@v21
       - name: Set up Nix caching
         uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Check formatting
