@@ -18,7 +18,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v20
       - name: Set up Nix caching
-        uses: DeterminateSystems/magic-nix-cache-action@main
+        uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Define matrix branches
         id: matrix-branches
         run: |
@@ -46,7 +46,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v20
       - name: Set up Nix caching
-        uses: DeterminateSystems/magic-nix-cache-action@main
+        uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Check system
         run: |
           current_system="$(nix eval --impure --raw --expr builtins.currentSystem)"
@@ -106,7 +106,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v20
       - name: Set up Nix caching
-        uses: DeterminateSystems/magic-nix-cache-action@main
+        uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Check system
         env:
           TARGET_SYSTEM: ${{ matrix.arch }}-linux
@@ -129,7 +129,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v20
       - name: Set up Nix caching
-        uses: DeterminateSystems/magic-nix-cache-action@main
+        uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Check formatting
         run: nix fmt -- --ci
       - name: Check evaluation
