@@ -3,8 +3,8 @@
     flake-utils.url = "github:numtide/flake-utils";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
     nixos-unstable.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
-    nixos-stable.url = "github:NixOS/nixpkgs?ref=nixos-25.05";
-    nixpkgs-stable-darwin.url = "github:NixOS/nixpkgs?ref=nixpkgs-25.05-darwin";
+    nixos-stable.url = "github:NixOS/nixpkgs?ref=nixos-25.11";
+    nixpkgs-stable-darwin.url = "github:NixOS/nixpkgs?ref=nixpkgs-25.11-darwin";
   };
 
   outputs =
