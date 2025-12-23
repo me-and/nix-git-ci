@@ -94,6 +94,12 @@ let
       };
       priority = 1;
     };
+    "maint-2.52" = {
+      rev = "9a2fb147f2c61d0cab52c883e7e26f5b7948e3ed";
+      hash = "sha256-2TMwVrb1PIxQSOnl2dR9EzMsSdVvfX5Z9HIpbEaxX94=";
+      version = "2.52.0";
+      priority = 3;
+    };
     "maint-2.51" = {
       rev = "bb5c624209fcaebd60b9572b2cc8c61086e39b57";
       hash = "sha256-2aOM0jlatuIlxngQyOkkZQ/b8mvuJ9jxUgPduCEyDrk=";
@@ -124,12 +130,6 @@ let
             ]
             prevAttrs.postInstall;
       };
-      priority = 3;
-    };
-    "maint-2.50" = {
-      rev = "f368df439b31b422169975cc3c95f7db6a46eada";
-      hash = "sha256-Up7l/879PSvA8ntpjdnmBUefK3l/B8rQi+qvGiS50iU=";
-      version = "2.50.1.11.gf368df439b";
       priority = 4;
     };
   };
@@ -140,10 +140,5 @@ let
 in
 if channelName == null then
   builtins.mapAttrs (n: v: throw "You should only be looking at the names!") baseData
-
-# Stop building maint-2.50 on unstable branches, as it's broken and
-# unnecessary.
-else if lib.hasSuffix "-unstable" channelName then
-  addSafeNames (lib.filterAttrs (n: v: n != "maint-2.50") baseData)
 else
   addSafeNames baseData
