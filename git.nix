@@ -26,16 +26,6 @@ let
       preFetch = "export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg "${updateScript}/libexec/prep-git-src.sh \"$dir\""}";
     };
 
-    # Needed as of v2.49.0-392-gfe35ce2ef8(contrib/completion: install Bash
-    # completion, 2025-04-22)
-    postInstall =
-      builtins.replaceStrings
-        [
-          "\nln -s $out/share/git/contrib/completion/git-completion.bash $out/share/bash-completion/completions/git\n"
-        ]
-        [ "\n" ]
-        prevAttrs.postInstall;
-
     # Don't leave .orig files just because the patch files didn't match
     # perfectly.
     patchFlags = "-p1 --no-backup-if-mismatch";
