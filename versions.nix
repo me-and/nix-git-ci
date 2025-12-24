@@ -20,13 +20,13 @@ let
       version = "2.52.0.457.g6b5491de43";
 
       extraOverride = prevAttrs: {
-        patches =
-          (prevAttrs.patches or [])
-          ++ [(pkgs.fetchurl {
-                name = "expect-gui--askyesno-failure-in-t1517.patch";
-                    url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
-                        hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
-                          })];
+        patches = (prevAttrs.patches or [ ]) ++ [
+          (pkgs.fetchurl {
+            name = "expect-gui--askyesno-failure-in-t1517.patch";
+            url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
+            hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
+          })
+        ];
       };
 
       priority = 2;
@@ -37,13 +37,13 @@ let
       version = "2.52.0.318.g66ce5f8e88";
 
       extraOverride = prevAttrs: {
-        patches =
-          (prevAttrs.patches or [])
-          ++ [(pkgs.fetchurl {
-                name = "expect-gui--askyesno-failure-in-t1517.patch";
-                    url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
-                        hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
-                          })];
+        patches = (prevAttrs.patches or [ ]) ++ [
+          (pkgs.fetchurl {
+            name = "expect-gui--askyesno-failure-in-t1517.patch";
+            url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
+            hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
+          })
+        ];
       };
 
       priority = 1;
@@ -54,13 +54,13 @@ let
       version = "2.52.0";
 
       extraOverride = prevAttrs: {
-        patches =
-          (prevAttrs.patches or [])
-          ++ [(pkgs.fetchurl {
-                name = "expect-gui--askyesno-failure-in-t1517.patch";
-                    url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
-                        hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
-                          })];
+        patches = (prevAttrs.patches or [ ]) ++ [
+          (pkgs.fetchurl {
+            name = "expect-gui--askyesno-failure-in-t1517.patch";
+            url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
+            hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
+          })
+        ];
       };
 
       priority = 3;
