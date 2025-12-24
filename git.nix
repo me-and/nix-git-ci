@@ -13,7 +13,13 @@ let
   repo = "git";
   localSrcName = "git-src"; # TODO is this necessary?
 
-  newGit = baseGit.overrideAttrs (prevAttrs: {
+  # TODO Remove this: it's only necessary as of 4580bcd235 (osxkeychain: avoid
+  # incorrectly skipping store operation, 2025-11-14), and I expect someone
+  # with a Darwin system will be able to make it work as soon as there's an
+  # actual release that has that change.
+  baseGit' = baseGit.override { osxkeychainSupport = false; };
+
+  newGit = baseGit'.overrideAttrs (prevAttrs: {
     inherit (versionData) version;
 
     src = fetchFromGitHub {
