@@ -32,9 +32,9 @@ let
       priority = 2;
     };
     master = {
-      rev = "66ce5f8e8872f0183bb137911c52b07f1f242d13";
-      hash = "sha256-USDTwYFYATJIkoDzwgrXp/xtSDXbBrHhT0IMDsBNYVg=";
-      version = "2.52.0.318.g66ce5f8e88";
+      rev = "7c7698a654a7a0031f65b0ab0c1c4e438e95df60";
+      hash = "sha256-44q9PFcsVMbPuzGqpyMAav7me1u2mKG5bOvgftPoZUY=";
+      version = "2.52.0.330.g7c7698a654";
 
       extraOverride = prevAttrs: {
         patches = (prevAttrs.patches or [ ]) ++ [
