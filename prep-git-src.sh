@@ -18,3 +18,5 @@ echo "${version_file_contents##GIT_VERSION*( )=*( )}" >version
 
 version_file_contents="$(<git-gui/GIT-VERSION-FILE)"
 echo "${version_file_contents##GITGUI_VERSION*( )=*( )}" >git-gui/version
+
+rm -rf .git

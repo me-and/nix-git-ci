@@ -28,7 +28,7 @@ let
       name = localSrcName;
       fetchSubmodules = false;
       deepClone = true;
-      leaveDotGit = false;
+      fetchTags = true;
       preFetch = "export NIX_PREFETCH_GIT_CHECKOUT_HOOK=${lib.escapeShellArg "${updateScript}/libexec/prep-git-src.sh \"$dir\""}";
     };
 
