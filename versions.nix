@@ -15,9 +15,9 @@
 let
   baseData = {
     next = {
-      rev = "33f00ee1fdef3746fc261e8e25787a197c83334f";
-      hash = "sha256-6VU68HYkXe05i0KDQnofmENqo2kgjbS1+ysenuskK4M=";
-      version = "2.52.0.482.g33f00ee1fd";
+      rev = "f8a7f5d287e066c1aa17ad0b3043598cd432f923";
+      hash = "sha256-7hsB/3PtBUSAyJ1nUJGwGtTt4kR5a/yYylkeVLBfYxs=";
+      version = "2.52.0.497.gf8a7f5d287";
 
       extraOverride = prevAttrs: {
         patches = (prevAttrs.patches or [ ]) ++ [
