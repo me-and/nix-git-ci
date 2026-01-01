@@ -13,6 +13,12 @@
   channelName ? null,
 }:
 let
+  t1517Patch = pkgs.fetchurl {
+    name = "expect-gui--askyesno-failure-in-t1517.patch";
+    url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
+    hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
+  };
+
   baseData = {
     next = {
       rev = "883dcfc63e9919461b343a9f21c411752d32df39";
@@ -21,15 +27,7 @@ let
 
       extraOverride = prevAttrs: {
         patches =
-          let
-            prevPatches = prevAttrs.patches or [ ];
-            newPatch = pkgs.fetchurl {
-              name = "expect-gui--askyesno-failure-in-t1517.patch";
-              url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
-              hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
-            };
-          in
-          prevPatches ++ lib.optional (!builtins.elem newPatch prevPatches) newPatch;
+          prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
       };
 
       priority = 2;
@@ -41,15 +39,7 @@ let
 
       extraOverride = prevAttrs: {
         patches =
-          let
-            prevPatches = prevAttrs.patches or [ ];
-            newPatch = pkgs.fetchurl {
-              name = "expect-gui--askyesno-failure-in-t1517.patch";
-              url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
-              hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
-            };
-          in
-          prevPatches ++ lib.optional (!builtins.elem newPatch prevPatches) newPatch;
+          prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
       };
 
       priority = 1;
@@ -61,15 +51,7 @@ let
 
       extraOverride = prevAttrs: {
         patches =
-          let
-            prevPatches = prevAttrs.patches or [ ];
-            newPatch = pkgs.fetchurl {
-              name = "expect-gui--askyesno-failure-in-t1517.patch";
-              url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
-              hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
-            };
-          in
-          prevPatches ++ lib.optional (!builtins.elem newPatch prevPatches) newPatch;
+          prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
       };
 
       priority = 3;
@@ -78,6 +60,11 @@ let
       rev = "bb5c624209fcaebd60b9572b2cc8c61086e39b57";
       hash = "sha256-2aOM0jlatuIlxngQyOkkZQ/b8mvuJ9jxUgPduCEyDrk=";
       version = "2.51.2";
+
+      extraOverride = prevAttrs: {
+        patches = lib.remove t1517Patch prevAttrs.patches;
+      };
+
       priority = 4;
     };
   };
