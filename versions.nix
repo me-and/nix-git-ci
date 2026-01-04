@@ -25,7 +25,7 @@ let
       hash = "sha256-MRR0l3uS6OuHjnP6LoQq06Fg2zLgeJIQOaVrRdV1fkw=";
       version = "2.52.0.508.g883dcfc63e";
 
-      extraOverride = prevAttrs: {
+      extraOverrideAttrs = prevAttrs: {
         patches =
           prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
       };
@@ -37,7 +37,7 @@ let
       hash = "sha256-3CxoJskNN1TS3LHtOQ3576q2908Po36hk+vhhRUPDnY=";
       version = "2.52.0.373.g68cb7f9e92";
 
-      extraOverride = prevAttrs: {
+      extraOverrideAttrs = prevAttrs: {
         patches =
           prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
       };
@@ -49,7 +49,7 @@ let
       hash = "sha256-2TMwVrb1PIxQSOnl2dR9EzMsSdVvfX5Z9HIpbEaxX94=";
       version = "2.52.0";
 
-      extraOverride = prevAttrs: {
+      extraOverrideAttrs = prevAttrs: {
         patches =
           prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
       };
@@ -61,7 +61,7 @@ let
       hash = "sha256-2aOM0jlatuIlxngQyOkkZQ/b8mvuJ9jxUgPduCEyDrk=";
       version = "2.51.2";
 
-      extraOverride = prevAttrs: {
+      extraOverrideAttrs = prevAttrs: {
         patches = lib.remove t1517Patch prevAttrs.patches;
       };
 

@@ -64,4 +64,4 @@ let
     + (prevAttrs.preConfigure or "");
   });
 in
-newGit.overrideAttrs (versionData.extraOverride or { })
+newGit.overrideAttrs (versionData.extraOverrideAttrs or { })
