@@ -21,10 +21,18 @@ let
   };
 
   fetchgitCheckFn =
-    versionData:
+    versionData: withRust:
     let
-      git = gitPackages."git-${versionData.safeName}";
-      gitMinimal = gitPackages."gitMinimal-${versionData.safeName}";
+      rustStr =
+        if withRust == null then
+          ""
+        else if withRust then
+          "withRust-"
+        else
+          "withoutRust-";
+
+      git = gitPackages."git-${rustStr}${versionData.safeName}";
+      gitMinimal = gitPackages."gitMinimal-${rustStr}${versionData.safeName}";
       git-lfs = pkgs.git-lfs.override { inherit git; };
       fetchgit = pkgs.fetchgit.override {
         inherit git-lfs;
@@ -41,11 +49,18 @@ let
       ) pkgs.tests.fetchgit;
     in
     lib.mapAttrs' (
-      n: v: lib.nameValuePair "${n}-${versionData.safeName}" (v.override { inherit fetchgit; })
+      n: v: lib.nameValuePair "${n}-${rustStr}${versionData.safeName}" (v.override { inherit fetchgit; })
     ) baseFetchgitChecks;
 
   fetchgitChecks = lib.mergeAttrsList (
-    builtins.map fetchgitCheckFn (builtins.attrValues versionData)
+    lib.attrsets.mapCartesianProduct ({ versionData, withRust }: fetchgitCheckFn versionData withRust) {
+      versionData = builtins.attrValues versionData;
+      withRust = [
+        true
+        false
+        null
+      ];
+    }
   );
 in
 lib.attrsets.unionOfDisjoint packageChecks fetchgitChecks
