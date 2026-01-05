@@ -21,9 +21,9 @@ let
 
   baseData = {
     next = {
-      rev = "883dcfc63e9919461b343a9f21c411752d32df39";
-      hash = "sha256-MRR0l3uS6OuHjnP6LoQq06Fg2zLgeJIQOaVrRdV1fkw=";
-      version = "2.52.0.508.g883dcfc63e";
+      rev = "c9366fe5a04afd4bfc01bb74b2471bc26509b37a";
+      hash = "sha256-dqW5QntiykTgXAV3n/37w6O4WQ6zla9RYaPgKDrv3Gw=";
+      version = "2.52.0.533.gc9366fe5a0";
 
       extraOverrideAttrs = prevAttrs: {
         patches =
