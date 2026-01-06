@@ -7,17 +7,25 @@
   autoconf,
   stdenv,
   gnupatch,
+  withRust,
 }:
 let
   owner = "gitster";
   repo = "git";
   localSrcName = "git-src"; # TODO is this necessary?
 
-  # TODO Remove this: it's only necessary as of 4580bcd235 (osxkeychain: avoid
-  # incorrectly skipping store operation, 2025-11-14), and I expect someone
-  # with a Darwin system will be able to make it work as soon as there's an
-  # actual release that has that change.
-  baseGit' = baseGit.override { osxkeychainSupport = false; };
+  # TODO Remove the conditional here once all the Nixpkgs versions I care about
+  # have the option to support Rust.  Currently this is a bit misleading, as
+  # we'll end up with the "withRust" and "withoutRust" versions of those
+  # packages being identical, but they'll be identical from a derivation
+  # perspective, too, so it won't make any difference.
+  baseGit' =
+    if withRust == null then
+      baseGit
+    else if baseGit.override.__functionArgs ? rustSupport then
+      baseGit.override { rustSupport = withRust; }
+    else
+      baseGit;
 
   newGit = baseGit'.overrideAttrs (prevAttrs: {
     inherit (versionData) version;
@@ -63,5 +71,8 @@ let
     ''
     + (prevAttrs.preConfigure or "");
   });
+
+  extraOverride = versionData.extraOverride or { };
+  extraOverrideAttrs = versionData.extraOverrideAttrs or { };
 in
-newGit.overrideAttrs (versionData.extraOverride or { })
+(newGit.overrideAttrs (versionData.extraOverrideAttrs or { })).override extraOverride

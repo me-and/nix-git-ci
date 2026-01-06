@@ -22,20 +22,47 @@ let
   topVersionData = builtins.head (lib.sortOn (v: v.priority) (builtins.attrValues versionData));
 
   makeGitFrom =
-    baseGit: versionData: pkgs.callPackage ./git.nix { inherit baseGit versionData updateScript; };
+    baseGit: versionData: withRust:
+    pkgs.callPackage ./git.nix {
+      inherit
+        baseGit
+        versionData
+        updateScript
+        withRust
+        ;
+    };
 
   allPackages = lib.attrsets.mergeAttrsList (
     lib.attrsets.mapCartesianProduct
       (
-        { packageName, versionData }:
         {
-          "${packageName}-${versionData.safeName}" =
-            makeGitFrom (builtins.getAttr packageName pkgs) versionData;
+          packageName,
+          versionData,
+          withRust,
+        }:
+        let
+          rustStr =
+            if withRust == null then
+              ""
+            else if withRust then
+              "withRust-"
+            else
+              "withoutRust-";
+        in
+        {
+          "${packageName}-${rustStr}${versionData.safeName}" =
+            makeGitFrom (builtins.getAttr packageName pkgs) versionData
+              withRust;
         }
       )
       {
         packageName = gitPackageNames;
         versionData = builtins.attrValues versionData;
+        withRust = [
+          true
+          false
+          null
+        ];
       }
   );
 in

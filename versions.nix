@@ -25,9 +25,17 @@ let
       hash = "sha256-kpO9TWRnd5kB3TCYDUq959OrnvU1CfGYDXYfoQtUYJw=";
       version = "2.52.0.542.g9473a8513b";
 
-      extraOverride = prevAttrs: {
+      extraOverrideAttrs = prevAttrs: {
         patches =
           prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
+      };
+
+      # TODO Remove this: it's only necessary as of 4580bcd235 (osxkeychain:
+      # avoid incorrectly skipping store operation, 2025-11-14), and I expect
+      # someone with a Darwin system will be able to make it work as soon as
+      # there's an actual release that has that change.
+      extraOverride = {
+        osxkeychainSupport = false;
       };
 
       priority = 2;
@@ -37,9 +45,17 @@ let
       hash = "sha256-JTyyMuN1MuoP4GaYkqebEGLJj0N9xionS3y9U+h/MWs=";
       version = "2.52.0.395.ge0bfec3dfc";
 
-      extraOverride = prevAttrs: {
+      extraOverrideAttrs = prevAttrs: {
         patches =
           prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
+      };
+
+      # TODO Remove this: it's only necessary as of 4580bcd235 (osxkeychain:
+      # avoid incorrectly skipping store operation, 2025-11-14), and I expect
+      # someone with a Darwin system will be able to make it work as soon as
+      # there's an actual release that has that change.
+      extraOverride = {
+        osxkeychainSupport = false;
       };
 
       priority = 1;
@@ -49,7 +65,7 @@ let
       hash = "sha256-2TMwVrb1PIxQSOnl2dR9EzMsSdVvfX5Z9HIpbEaxX94=";
       version = "2.52.0";
 
-      extraOverride = prevAttrs: {
+      extraOverrideAttrs = prevAttrs: {
         patches =
           prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
       };
@@ -61,7 +77,7 @@ let
       hash = "sha256-2aOM0jlatuIlxngQyOkkZQ/b8mvuJ9jxUgPduCEyDrk=";
       version = "2.51.2";
 
-      extraOverride = prevAttrs: {
+      extraOverrideAttrs = prevAttrs: {
         patches = lib.remove t1517Patch prevAttrs.patches;
       };
 
