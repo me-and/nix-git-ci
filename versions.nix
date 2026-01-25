@@ -27,7 +27,10 @@ let
 
       extraOverrideAttrs = prevAttrs: {
         patches =
-          prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
+          (builtins.filter (
+            p: p.name or "" != "last-modified-fix-bug-caused-by-inproper-initialized-memory.patch"
+          ) prevAttrs.patches)
+          ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
       };
 
       # TODO Remove this: it's only necessary as of 4580bcd235 (osxkeychain:
@@ -47,7 +50,10 @@ let
 
       extraOverrideAttrs = prevAttrs: {
         patches =
-          prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
+          (builtins.filter (
+            p: p.name or "" != "last-modified-fix-bug-caused-by-inproper-initialized-memory.patch"
+          ) prevAttrs.patches)
+          ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
       };
 
       # TODO Remove this: it's only necessary as of 4580bcd235 (osxkeychain:
