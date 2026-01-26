@@ -18,6 +18,16 @@ let
     url = "https://lore.kernel.org/git/20251201031040.1120091-1-brianmlyles@gmail.com/raw";
     hash = "sha256-vvhbvg74OIMzfksHiErSnjOZ+W0M/T9J8GOQ4E4wKbU=";
   };
+  t8020Patch = pkgs.fetchurl {
+    name = "last-modified-fix-bug-caused-by-inproper-initialized-memory.patch";
+    url = "https://lore.kernel.org/git/20251128-toon-big-endian-ci-v1-1-80da0f629c1e@iotcl.com/raw";
+    hash = "sha256-WdewOwD7hMhnahhUUEYAlM58tT3MkxUlBa3n8IwrESU=";
+  };
+
+  addPatches = toAdd: patches: patches ++ builtins.filter (p: !builtins.elem p patches) toAdd;
+  addPatch = patch: addPatches [ patch ];
+  removePatches = toRemove: builtins.filter (p: !builtins.elem p toRemove);
+  removePatch = patch: removePatches [ patch ];
 
   baseData = {
     next = {
@@ -26,11 +36,7 @@ let
       version = "2.53.0.rc1.267.g6e3a78c723";
 
       extraOverrideAttrs = prevAttrs: {
-        patches =
-          (builtins.filter (
-            p: p.name or "" != "last-modified-fix-bug-caused-by-inproper-initialized-memory.patch"
-          ) prevAttrs.patches)
-          ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
+        patches = addPatch t1517Patch (removePatch t8020Patch prevAttrs.patches);
       };
 
       # TODO Remove this: it's only necessary as of 4580bcd235 (osxkeychain:
@@ -49,11 +55,7 @@ let
       version = "2.53.0.rc1.65.gea24e2c554";
 
       extraOverrideAttrs = prevAttrs: {
-        patches =
-          (builtins.filter (
-            p: p.name or "" != "last-modified-fix-bug-caused-by-inproper-initialized-memory.patch"
-          ) prevAttrs.patches)
-          ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
+        patches = addPatch t1517Patch (removePatch t8020Patch prevAttrs.patches);
       };
 
       # TODO Remove this: it's only necessary as of 4580bcd235 (osxkeychain:
@@ -72,8 +74,7 @@ let
       version = "2.52.0";
 
       extraOverrideAttrs = prevAttrs: {
-        patches =
-          prevAttrs.patches ++ lib.optional (!builtins.elem t1517Patch prevAttrs.patches) t1517Patch;
+        patches = addPatch t1517Patch (removePatch t8020Patch prevAttrs.patches);
       };
 
       priority = 3;
@@ -84,7 +85,7 @@ let
       version = "2.51.2";
 
       extraOverrideAttrs = prevAttrs: {
-        patches = lib.remove t1517Patch prevAttrs.patches;
+        patches = removePatches [ t1517Patch t8020Patch ] prevAttrs.patches;
       };
 
       priority = 4;
