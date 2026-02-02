@@ -50,9 +50,9 @@ let
       priority = 2;
     };
     master = {
-      rev = "22584464849815268419fd9d2eba307362360db1";
-      hash = "sha256-JTA4+jM6HfEfhdpkDxk6TZ0MErN108ct6jhCJNQ8uIA=";
-      version = "2.53.0.rc2.2.g2258446484";
+      rev = "67ad42147a7acc2af6074753ebd03d904476118f";
+      hash = "sha256-ChyfKmYW+VimCXr0CTvnkgBgY+fauVsBK0rbIwiDdvc=";
+      version = "2.53.0";
 
       extraOverrideAttrs = prevAttrs: {
         patches = addPatch t1517Patch (removePatch t8020Patch prevAttrs.patches);
