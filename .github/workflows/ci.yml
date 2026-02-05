@@ -18,6 +18,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v21
       - name: Set up Nix caching
+        if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Define matrix branches
         id: matrix-branches
@@ -88,6 +89,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v21
       - name: Set up Nix caching
+        if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Check system
         run: |
@@ -125,6 +127,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v21
       - name: Set up Nix caching
+        if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@v13
       - name: Check formatting
         run: nix fmt -- --ci
