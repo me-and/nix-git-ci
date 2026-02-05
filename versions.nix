@@ -68,6 +68,17 @@ let
 
       priority = 1;
     };
+    "maint-2.53" = {
+      rev = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      version = "0";
+
+      extraOverrideAttrs = prevAttrs: {
+        patches = addPatch t1517Patch (removePatch t8020Patch prevAttrs.patches);
+      };
+
+      priority = 3;
+    };
     "maint-2.52" = {
       rev = "9a2fb147f2c61d0cab52c883e7e26f5b7948e3ed";
       hash = "sha256-2TMwVrb1PIxQSOnl2dR9EzMsSdVvfX5Z9HIpbEaxX94=";
@@ -77,7 +88,7 @@ let
         patches = addPatch t1517Patch (removePatch t8020Patch prevAttrs.patches);
       };
 
-      priority = 3;
+      priority = 4;
     };
     "maint-2.51" = {
       rev = "bb5c624209fcaebd60b9572b2cc8c61086e39b57";
@@ -88,7 +99,7 @@ let
         patches = removePatches [ t1517Patch t8020Patch ] prevAttrs.patches;
       };
 
-      priority = 4;
+      priority = 5;
     };
   };
 
