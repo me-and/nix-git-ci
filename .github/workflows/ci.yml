@@ -85,6 +85,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Recover runner disk space
+        if: matrix.platform != 'darwin'
         uses: wimpysworld/nothing-but-nix@v9
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v21
