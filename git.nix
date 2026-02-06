@@ -7,27 +7,13 @@
   autoconf,
   stdenv,
   gnupatch,
-  withRust,
 }:
 let
   owner = "gitster";
   repo = "git";
   localSrcName = "git-src"; # TODO is this necessary?
 
-  # TODO Remove the conditional here once all the Nixpkgs versions I care about
-  # have the option to support Rust.  Currently this is a bit misleading, as
-  # we'll end up with the "withRust" and "withoutRust" versions of those
-  # packages being identical, but they'll be identical from a derivation
-  # perspective, too, so it won't make any difference.
-  baseGit' =
-    if withRust == null then
-      baseGit
-    else if baseGit.override.__functionArgs ? rustSupport then
-      baseGit.override { rustSupport = withRust; }
-    else
-      baseGit;
-
-  newGit = baseGit'.overrideAttrs (prevAttrs: {
+  newGit = baseGit.overrideAttrs (prevAttrs: {
     inherit (versionData) version;
 
     src = fetchFromGitHub {
