@@ -77,6 +77,14 @@ let
         patches = addPatch t1517Patch (removePatch t8020Patch prevAttrs.patches);
       };
 
+      # TODO Remove this: it's only necessary as of 4580bcd235 (osxkeychain:
+      # avoid incorrectly skipping store operation, 2025-11-14), and I expect
+      # someone with a Darwin system will be able to make it work as soon as
+      # there's an actual release that has that change.
+      extraOverride = {
+        osxkeychainSupport = false;
+      };
+
       priority = 3;
     };
     "maint-2.52" = {
