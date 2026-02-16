@@ -86,7 +86,7 @@ jobs:
         uses: actions/checkout@v6
       - name: Recover runner disk space
         if: matrix.platform != 'darwin'
-        uses: wimpysworld/nothing-but-nix@v9
+        uses: wimpysworld/nothing-but-nix@v10
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v21
       - name: Set up Nix caching
