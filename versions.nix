@@ -31,9 +31,9 @@ let
 
   baseData = {
     next = {
-      rev = "309c995771be952610fdcff99f7fea96934ce045";
-      hash = "sha256-GFNz/eqSpop8Un14ix1qVZLpl4+2Nu44QHlZCEMyVkw=";
-      version = "2.53.0.536.g309c995771";
+      rev = "e6e9f13364f60da08915a4183156646fcdad0ff3";
+      hash = "sha256-Od6eN5cW5aT9tt32Ue3iMHxaULaJ5hzQ0XvNkqOvQgA=";
+      version = "2.53.0.564.ge6e9f13364";
 
       extraOverrideAttrs = prevAttrs: {
         patches = addPatch t1517Patch (removePatch t8020Patch prevAttrs.patches);
