@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v21
+        uses: DeterminateSystems/nix-installer-action@v22
       - name: Set up Nix caching
         if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@v13
@@ -88,7 +88,7 @@ jobs:
         if: matrix.platform != 'darwin'
         uses: wimpysworld/nothing-but-nix@v10
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v21
+        uses: DeterminateSystems/nix-installer-action@v22
       - name: Set up Nix caching
         if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@v13
@@ -126,7 +126,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v21
+        uses: DeterminateSystems/nix-installer-action@v22
       - name: Set up Nix caching
         if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@v13
