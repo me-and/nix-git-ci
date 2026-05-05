@@ -52,11 +52,11 @@
     },
     "nixpkgs-stable-darwin": {
       "locked": {
-        "lastModified": 1777805331,
-        "narHash": "sha256-jINoZUP2tJEBLuVoMEhJn9qWQgpriGorwlgnBc1QAPg=",
+        "lastModified": 1777881431,
+        "narHash": "sha256-R+XRbuk1i43rOU6R/yatQ/0g5+1ctpBGz1m9KpDclLo=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "8cbe20ad0f64f9f9619b871dfdf57022beccef65",
+        "rev": "94a14d8d0c2796928e734cd53662572e95a2877a",
         "type": "github"
       },
       "original": {
