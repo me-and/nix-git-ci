@@ -21,19 +21,16 @@
           let
             isType = type: (builtins.match ".*-${type}" system) == [ ];
           in
-          # TODO Reverse these lists: I'd rather have unstable first, but
-          # unstable is currently affected by
-          # https://github.com/NixOS/nixpkgs/issues/473332
           if isType "linux" then
             [
-              "nixos-stable"
-              "nixos-unstable"
               "nixpkgs-unstable"
+              "nixos-unstable"
+              "nixos-stable"
             ]
           else if isType "darwin" then
             [
-              "nixpkgs-stable-darwin"
               "nixpkgs-unstable"
+              "nixpkgs-stable-darwin"
             ]
           else
             throw "Unexpected system type ${system}";
