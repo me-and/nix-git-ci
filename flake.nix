@@ -1,96 +1,159 @@
 {
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
-    nixos-unstable.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
-    nixos-stable.url = "github:NixOS/nixpkgs?ref=nixos-25.11";
-    nixpkgs-stable-darwin.url = "github:NixOS/nixpkgs?ref=nixpkgs-25.11-darwin";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
+
+    gitMain = {
+      url = "github:gitster/git";
+      flake = false;
+    };
+    gitNext = {
+      url = "github:gitster/git?ref=next";
+      flake = false;
+    };
+    gitMaint = {
+      url = "github:gitster/git?ref=maint-2.54";
+      flake = false;
+    };
   };
 
   outputs =
     {
       self,
       flake-utils,
-      nixpkgs-unstable,
-      ...
-    }@inputs:
-    flake-utils.lib.eachDefaultSystem (
+      nixpkgs,
+      gitMain,
+      gitNext,
+      gitMaint,
+    }:
+    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (
       system:
       let
-        channelNames =
-          let
-            isType = type: (builtins.match ".*-${type}" system) == [ ];
-          in
-          if isType "linux" then
-            [
-              "nixpkgs-unstable"
-              "nixos-unstable"
-              "nixos-stable"
-            ]
-          else if isType "darwin" then
-            [
-              "nixpkgs-unstable"
-              "nixpkgs-stable-darwin"
-            ]
-          else
-            throw "Unexpected system type ${system}";
-        topChannelName = builtins.head channelNames;
-
-        channelToPkgs = channelName: import (builtins.getAttr channelName inputs) { inherit system; };
-
-        pkgs = channelToPkgs topChannelName;
-        inherit (pkgs) lib;
-
-        # Combination of lib.attrsets.mergeAttrsList and
-        # lib.attrsets.unionOfDisjoint: merge an arbitrary sized list of
-        # attrsets, where any attr that is defined in multiple sets will throw
-        # an error.
-        mergeDisjoint = lib.foldl lib.attrsets.unionOfDisjoint { };
+        inherit (nixpkgs) lib;
+        pkgs = import nixpkgs { inherit system; };
       in
-      rec {
-        packages =
+      {
+        legacyPackages =
           let
-            channelToGitPackages =
-              channelName:
-              lib.mapAttrs' (n: v: lib.nameValuePair "${n}-${channelName}" v) (
-                import ./. {
-                  inherit channelName;
-                  pkgs = channelToPkgs channelName;
-                  updateScript = packages."updateScript-${channelName}";
-                }
-              );
-            allGitPackages = mergeDisjoint (map channelToGitPackages channelNames);
+            applyOverrides = nixpkgs.lib.foldl' (drv': override: drv'.override override);
+            applyAttrOverrides = nixpkgs.lib.foldl' (drv': override: drv'.overrideAttrs override);
 
-            channelToUpdateScript = channelName: (channelToPkgs channelName).callPackage ./updater.nix { };
+            patchGit =
+              name: src:
+              {
+                overrides ? [ ],
+                attrOverrides ? [ ],
+              }:
+              git:
+              let
+                defaultAttrOverride = prevAttrs: {
+                  inherit src;
+                  pname = "${prevAttrs.pname}-${name}@${src.shortRev}";
 
-            updateScriptPackages = lib.listToAttrs (
-              map (n: lib.nameValuePair "updateScript-${n}" (channelToUpdateScript n)) channelNames
-            );
+                };
+                defaultOverride = {
+                  doInstallCheck = true;
+                };
+
+                git' = applyAttrOverrides git ([ defaultAttrOverride ] ++ attrOverrides);
+                git'' = applyOverrides git' ([ defaultOverride ] ++ overrides);
+              in
+              git'';
+
+            gitSourcePatchers =
+              let
+                # TODO Find out what's going on upstream with this patch,
+                # because it looks like nobody has tried to apply it, and the
+                # original patch has been invalidated by other upstream
+                # changes.
+                fix1517Patch = prevAttrs: {
+                  patches =
+                    let
+                      parts = builtins.partition (
+                        p: p.name or "" != "expect-gui--askyesno-failure-in-t1517.patch"
+                      ) prevAttrs.patches;
+                    in
+                    assert builtins.length parts.wrong == 1;
+                    parts.right ++ [ ./expect-gui--askyesno-failure-in-t1517.patch ];
+                };
+
+                respectRustAfterDefaultOn = prevAttrs: {
+                  makeFlags =
+                    let
+                      parts = builtins.partition (s: s != "WITH_RUST=YesPlease") prevAttrs.makeFlags;
+                      wantRust = builtins.length parts.wrong > 0;
+                    in
+                    parts.right ++ nixpkgs.lib.optional (!wantRust) "NO_RUST=YesPlease";
+                };
+
+                # Check the version in Nixpkgs matches the version in the Git
+                # maintenance branch, to avoid Nixpkgs getting ahead/behind of
+                # the Git maintenance branch I'm tracking.
+                checkMaintVersion = finalAttrs: prevAttrs: {
+                  passthru = prevAttrs.passthru // {
+                    tests = lib.attrsets.unionOfDisjoint prevAttrs.passthru.tests {
+                      maintVersionCheck =
+                        let
+                          nixpkgsGitVersion = lib.versions.majorMinor prevAttrs.version;
+                        in
+                        pkgs.runCommand "maint-version" { } ''
+                          src_dir=${lib.escapeShellArg finalAttrs.src}
+                          src_version="$("$src_dir"/GIT-VERSION-GEN "$src_dir" --format=@GIT_MAJOR_VERSION@.@GIT_MINOR_VERSION@)"
+
+                          if [[ "$src_version" = ${lib.escapeShellArg nixpkgsGitVersion} ]]; then
+                            touch "$out"
+                          else
+                            echo "git maintenance version mismatch"
+                            echo "nixpkgs has "${lib.escapeShellArg nixpkgsGitVersion}
+                            echo "git maintenance branch has $src_version"
+                            echo "probably want to update the maintenance branch in flake.nix"
+                            exit 78
+                          fi >&2
+                        '';
+                    };
+                  };
+                };
+              in
+              {
+                gitMain = patchGit "main" gitMain {
+                  attrOverrides = [
+                    fix1517Patch
+                    respectRustAfterDefaultOn
+                  ];
+                };
+                gitNext = patchGit "next" gitNext {
+                  attrOverrides = [
+                    fix1517Patch
+                    respectRustAfterDefaultOn
+                  ];
+                };
+                gitMaint = patchGit "maint" gitMaint { attrOverrides = [ checkMaintVersion ]; };
+              };
+
+            basePackages = {
+              inherit (pkgs)
+                gitMinimal
+                git
+                gitSVN
+                gitFull
+                ;
+            };
+
+            recurseForDerivations = s: s // { recurseForDerivations = true; };
+
+            patcherToGitPackages = patcher: recurseForDerivations (builtins.mapAttrs (n: patcher) basePackages);
           in
-          mergeDisjoint [
-            allGitPackages
-            updateScriptPackages
-            { default = allGitPackages."default-${topChannelName}"; }
-          ];
+          builtins.mapAttrs (n: patcherToGitPackages) gitSourcePatchers;
 
-        checks =
-          let
-            channelToChecks =
-              channelName:
-              lib.mapAttrs' (n: v: lib.nameValuePair "${n}-${channelName}" v) (
-                import ./checks.nix {
-                  inherit channelName;
-                  pkgs = channelToPkgs channelName;
-                  updateScript = packages."updateScript-${channelName}";
-                }
-              );
-          in
-          mergeDisjoint (map channelToChecks channelNames);
+        packages = flake-utils.lib.flattenTree self.legacyPackages."${system}";
 
-        apps.updateScript = {
-          type = "app";
-          program = "${packages."updateScript-${topChannelName}"}/bin/update.sh";
-        };
+        checks = flake-utils.lib.flattenTree (
+          builtins.mapAttrs (n: v: {
+            package = v;
+            tests = v.passthru.tests;
+            recurseForDerivations = true;
+          }) self.packages."${system}"
+        );
 
         formatter = pkgs.nixfmt-tree;
       }

@@ -4,122 +4,31 @@ on:
   - pull_request
 
 jobs:
-  # This is only necessary to provide a sensible split of the builds so they
-  # all complete in time on Darwin.  Everything is quick enough everywhere
-  # else, but it's easiest to just do the same split across the board.
-  matrix-branches:
-    name: Decide build matrix branches
-    runs-on: ubuntu-latest
-    outputs:
-      matrix-branches: ${{ steps.matrix-branches.outputs.matrix-branches }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v22
-      - name: Set up Nix caching
-        if: github.ref == 'refs/heads/main'
-        uses: DeterminateSystems/magic-nix-cache-action@v13
-      - name: Define matrix branches
-        id: matrix-branches
-        run: |
-          {
-            printf 'matrix-branches='
-            nix eval --impure --apply builtins.attrNames --expr 'import ./versions.nix {}' --json |
-              jq -c 'map(gsub("\\."; "_"))'
-          } | tee -a "$GITHUB_OUTPUT"
-
   run-tests:
     name: Run tests
     runs-on: ${{ matrix.runner }}
-    needs: matrix-branches
     strategy:
       fail-fast: false
       matrix:
-        arch:
-          - x86_64
-          - aarch64
-
-        platform:
-          - linux
-          - darwin
-
-        channel:
-          - nixpkgs-unstable
-          - nixos-unstable
-          - nixpkgs-stable-darwin
-          - nixos-stable
-
-        branch: ${{ fromJSON(needs.matrix-branches.outputs.matrix-branches) }}
-
-        # Define architecture values according to the runner in use.
-        include:
-          - arch: x86_64
-            platform: linux
-            runner: ubuntu-latest
-          - arch: aarch64
-            platform: linux
-            runner: ubuntu-24.04-arm
-          - arch: aarch64
-            platform: darwin
-            runner: macos-latest
-
-        # Skip architecture/platform/channel combinations that aren't valid or
-        # relevant.
-        exclude:
-          - arch: x86_64
-            platform: darwin
-          - channel: nixos-unstable
-            platform: darwin
-          - channel: nixos-stable
-            platform: darwin
-          - channel: nixpkgs-stable-darwin
-            platform: linux
-
-    env:
-      TARGET_SYSTEM: ${{ matrix.arch }}-${{ matrix.platform }}
-      CHANNEL: ${{ matrix.channel }}
-      BRANCH: ${{ matrix.branch }}
+        runner:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Recover runner disk space
-        if: matrix.platform != 'darwin'
         uses: wimpysworld/nothing-but-nix@v10
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v22
       - name: Set up Nix caching
         if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@v13
-      - name: Check system
-        run: |
-          current_system="$(nix eval --impure --raw --expr builtins.currentSystem)"
-          if [[ "$current_system" != "$TARGET_SYSTEM" ]]; then
-              printf '::error title=System mismatch::Running on %s, expected %s\n' "$current_system" "$TARGET_SYSTEM"
-              exit 1
-          fi
       - name: Run checks
         timeout-minutes: 345
-        run: |
-          tmpdir="$(mktemp -d)"
-          nix eval --json --apply builtins.attrNames .#checks."$TARGET_SYSTEM" >"$tmpdir"/checkattrs
-          # Escaping here based on lib.strings.escapeNixIdentifier
-          jq --raw-output '.[]
-              | select(endswith("-\($ENV.BRANCH)-\($ENV.CHANNEL)"))
-              | ["checks", $ENV.TARGET_SYSTEM, .]
-              | map(
-                  if test("^[a-zA-Z_][a-zA-Z0-9_'\''-]*$")
-                  then .
-                  else @json | gsub("\\$"; "\\$")
-                  end
-                  )
-              | join(".")
-              | ".#" + .
-          ' >"$tmpdir"/checktargets <"$tmpdir"/checkattrs
-          nix build --stdin --keep-going <"$tmpdir"/checktargets
+        run: nix flake check
 
-  check-fmt:
+  fmt:
     name: Check formatting and evaluation
     runs-on: ubuntu-latest
     steps:
