@@ -23,7 +23,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v22
       - name: Set up Nix caching
         if: github.ref == 'refs/heads/main'
-        uses: DeterminateSystems/magic-nix-cache-action@v13
+        uses: DeterminateSystems/magic-nix-cache-action@v14
       - name: Run checks
         timeout-minutes: 345
         run: nix flake check
@@ -38,7 +38,7 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v22
       - name: Set up Nix caching
         if: github.ref == 'refs/heads/main'
-        uses: DeterminateSystems/magic-nix-cache-action@v13
+        uses: DeterminateSystems/magic-nix-cache-action@v14
       - name: Check formatting
         run: nix fmt -- --ci
       - name: Check evaluation
