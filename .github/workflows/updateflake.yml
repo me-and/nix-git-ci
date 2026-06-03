@@ -18,7 +18,9 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v22
       - name: Set up Nix caching
-        uses: DeterminateSystems/magic-nix-cache-action@v14
+        uses: me-and/magic-nix-cache-action@restore-only
+        with:
+          save-cache: ${{ github.ref == 'refs/heads/main' }}
       - name: Update inputs
         env:
           GIT_AUTHOR_EMAIL: actions@github.com
