@@ -14,6 +14,12 @@ jobs:
           - ubuntu-latest
           - ubuntu-24.04-arm
 
+        include:
+          - runner: ubuntu-latest
+            cache-action-source: https://github.com/me-and/magic-nix-cache/releases/download/v0.1.6-unstable-0.1.0/magic-nix-cache-closure-X64-Linux
+          - runner: ubuntu-24.04-arm
+            cache-action-source: https://github.com/me-and/magic-nix-cache/releases/download/v0.1.6-unstable-0.1.0/magic-nix-cache-closure-ARM64-Linux
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -25,6 +31,7 @@ jobs:
         uses: me-and/magic-nix-cache-action@restore-only
         with:
           save-cache: ${{ github.ref == 'refs/heads/main' }}
+          source-url: ${{ matrix.cache-action-source }}
       - name: Run checks
         timeout-minutes: 345
         run: nix flake check
@@ -41,6 +48,7 @@ jobs:
         uses: me-and/magic-nix-cache-action@restore-only
         with:
           save-cache: ${{ github.ref == 'refs/heads/main' }}
+          source-url: https://github.com/me-and/magic-nix-cache/releases/download/v0.1.6-unstable-0.1.0/magic-nix-cache-closure-X64-Linux
       - name: Check formatting
         run: nix fmt -- --ci
       - name: Check evaluation
