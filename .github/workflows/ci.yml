@@ -24,7 +24,7 @@ jobs:
         with:
           extra-conf: |
             experimental-features = nix-command flakes auto-allocate-uids cgroups
-            system-features = uid-range
+            system-features = nixos-test benchmark big-parallel kvm uid-range
             auto-omptimise-store = true
             auto-allocate-uids = true
       - name: Set up Nix caching
