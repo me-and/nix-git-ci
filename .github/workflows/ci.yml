@@ -20,7 +20,13 @@ jobs:
       - name: Recover runner disk space
         uses: wimpysworld/nothing-but-nix@v10
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v22
+        uses: NixOS/nix-installer-action@6b8548fe06acfb0155a50ab5d561accb215764cc
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes auto-allocate-uids cgroups
+            system-features = uid-range
+            auto-omptimise-store = true
+            auto-allocate-uids = true
       - name: Set up Nix caching
         if: github.ref == 'refs/heads/main'
         uses: DeterminateSystems/magic-nix-cache-action@v14
