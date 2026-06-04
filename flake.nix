@@ -46,16 +46,32 @@
               }:
               git:
               let
-                defaultAttrOverride = prevAttrs: {
-                  inherit src;
-                  pname = "${prevAttrs.pname}-${name}@${src.shortRev}";
+                defaultAttrOverrides = builtins.attrValues {
+                  setSrc = { inherit src; };
 
+                  # Include the branch name and revision in the derivation name.
+                  addName = prevAttrs: { pname = "${prevAttrs.pname}-${name}@${src.shortRev}"; };
+
+                  # The passthru tests are either (a) just building the package
+                  # as we already do, or (b) built using Nixpkgs' base Git
+                  # package rather than the one we're creating, so aren't
+                  # testing anything new.  Disable the lot of them.
+                  #
+                  # TODO: Fix things so we override the tests to use the
+                  # versions of Git that we're building.  That should probably
+                  # happen in Nixpkgs rather than here.
+                  removeBuildbotTest = prevAttrs: {
+                    passthru = prevAttrs.passthru // {
+                      tests = { };
+                    };
+                  };
                 };
+
                 defaultOverride = {
                   doInstallCheck = true;
                 };
 
-                git' = applyAttrOverrides git ([ defaultAttrOverride ] ++ attrOverrides);
+                git' = applyAttrOverrides git (defaultAttrOverrides ++ attrOverrides);
                 git'' = applyOverrides git' ([ defaultOverride ] ++ overrides);
               in
               git'';
