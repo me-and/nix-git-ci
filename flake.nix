@@ -75,6 +75,9 @@
                   # Disable t1517 because it's too unreliable.
                   # https://github.com/NixOS/nixpkgs/pull/537119
                   noT1517 = prevAttrs: {
+                    patches = builtins.filter (
+                      p: p.name or "" != "expect-gui--askyesno-failure-in-t1517.patch"
+                    ) prevAttrs.patches;
                     preInstallCheck = prevAttrs.preInstallCheck or "" + ''
                       rm t/t1517-outside-repo.sh
                     '';
@@ -99,6 +102,12 @@
                       wantRust = builtins.length parts.wrong > 0;
                     in
                     parts.right ++ nixpkgs.lib.optional (!wantRust) "NO_RUST=YesPlease";
+                };
+
+                removeUnnecessaryRustPatch = prevAttrs: {
+                  patches = builtins.filter (
+                    p: builtins.baseNameOf p != "osxkeychain-link-rust_lib.patch"
+                  ) prevAttrs.patches;
                 };
 
                 # Check the version in Nixpkgs matches the version in the Git
@@ -131,10 +140,16 @@
               in
               {
                 gitMain = patchGit "main" gitMain {
-                  attrOverrides = [ respectRustAfterDefaultOn ];
+                  attrOverrides = [
+                    respectRustAfterDefaultOn
+                    removeUnnecessaryRustPatch
+                  ];
                 };
                 gitNext = patchGit "next" gitNext {
-                  attrOverrides = [ respectRustAfterDefaultOn ];
+                  attrOverrides = [
+                    respectRustAfterDefaultOn
+                    removeUnnecessaryRustPatch
+                  ];
                 };
                 gitMaint = patchGit "maint" gitMaint { attrOverrides = [ checkMaintVersion ]; };
               };
