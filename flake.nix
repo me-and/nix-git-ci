@@ -65,6 +65,23 @@
                       tests = { };
                     };
                   };
+
+                  # Set the value of debug in the installCheckPhase environment.
+                  # https://github.com/NixOS/nixpkgs/pull/537119#issuecomment-4939419503
+                  noDebugTests = prevAttrs: {
+                    installCheckFlags = prevAttrs.installCheckFlags or [ ] ++ [ "debug=" ];
+                  };
+
+                  # Disable t1517 because it's too unreliable.
+                  # https://github.com/NixOS/nixpkgs/pull/537119
+                  noT1517 = prevAttrs: {
+                    patches = builtins.filter (
+                      p: p.name or "" != "expect-gui--askyesno-failure-in-t1517.patch"
+                    ) prevAttrs.patches;
+                    preInstallCheck = prevAttrs.preInstallCheck or "" + ''
+                      rm t/t1517-outside-repo.sh
+                    '';
+                  };
                 };
 
                 defaultOverride = {
@@ -78,21 +95,6 @@
 
             gitSourcePatchers =
               let
-                # TODO Find out what's going on upstream with this patch,
-                # because it looks like nobody has tried to apply it, and the
-                # original patch has been invalidated by other upstream
-                # changes.
-                fix1517Patch = prevAttrs: {
-                  patches =
-                    let
-                      parts = builtins.partition (
-                        p: p.name or "" != "expect-gui--askyesno-failure-in-t1517.patch"
-                      ) prevAttrs.patches;
-                    in
-                    assert builtins.length parts.wrong == 1;
-                    parts.right ++ [ ./expect-gui--askyesno-failure-in-t1517.patch ];
-                };
-
                 respectRustAfterDefaultOn = prevAttrs: {
                   makeFlags =
                     let
@@ -100,6 +102,12 @@
                       wantRust = builtins.length parts.wrong > 0;
                     in
                     parts.right ++ nixpkgs.lib.optional (!wantRust) "NO_RUST=YesPlease";
+                };
+
+                removeUnnecessaryRustPatch = prevAttrs: {
+                  patches = builtins.filter (
+                    p: builtins.baseNameOf p != "osxkeychain-link-rust_lib.patch"
+                  ) prevAttrs.patches;
                 };
 
                 # Check the version in Nixpkgs matches the version in the Git
@@ -133,14 +141,14 @@
               {
                 gitMain = patchGit "main" gitMain {
                   attrOverrides = [
-                    fix1517Patch
                     respectRustAfterDefaultOn
+                    removeUnnecessaryRustPatch
                   ];
                 };
                 gitNext = patchGit "next" gitNext {
                   attrOverrides = [
-                    fix1517Patch
                     respectRustAfterDefaultOn
+                    removeUnnecessaryRustPatch
                   ];
                 };
                 gitMaint = patchGit "maint" gitMaint { attrOverrides = [ checkMaintVersion ]; };
