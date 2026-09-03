@@ -88,6 +88,42 @@
                   addCurlConfigToPath = prevAttrs: {
                     nativeBuildInputs = prevAttrs.nativeBuildInputs or [ ] ++ [ (lib.getDev pkgs.curl) ];
                   };
+
+                  # Nixpkgs sets SHELL_PATH to stdenv.shell, which is bash
+                  # under its own name.  Upstream's default is /bin/sh, and
+                  # bash only enters POSIX mode when invoked as `sh`, so
+                  # Nixpkgs runs the test suite in a mode upstream almost never
+                  # exercises.  That's a real difference in behaviour rather
+                  # than a cosmetic one: t1017 (new since v2.55.0 via
+                  # ps/cat-file-remote-object-info) has an unquoted redirection
+                  # target,
+                  #
+                  #     echo_without_newline "$hello_content" > $daemon_parent/hello
+                  #
+                  # whose value contains the trash directory path, which always
+                  # has a space in it.  POSIX only requires field splitting of
+                  # a redirection word in interactive shells, so bash-as-`sh`
+                  # expands it to the single intended path, while bash under
+                  # its own name splits it and fails with "ambiguous
+                  # redirect", taking out 13 of t1017's 21 tests.
+                  #
+                  # (This is not about the shebangs: t/run-test.sh runs each
+                  # test under TEST_SHELL_PATH, which defaults to SHELL_PATH.)
+                  #
+                  # Point SHELL_PATH at the same shell's `sh` entrypoint, which
+                  # matches upstream's default behaviour.  Nixpkgs should adopt
+                  # this too.  Note stdenv.shell is runtimeShellPackage's bash,
+                  # not stdenv.shellPackage's -- the latter is interactive bash
+                  # on Linux, and pulling that in would be a change of shell as
+                  # well as of argv[0].
+                  useShAsShellPath =
+                    prevAttrs:
+                    lib.optionalAttrs (pkgs.stdenv.buildPlatform == pkgs.stdenv.hostPlatform) {
+                      makeFlags =
+                        builtins.filter (flag: !(lib.isString flag && lib.hasPrefix "SHELL_PATH=" flag))
+                          prevAttrs.makeFlags or [ ]
+                        ++ [ "SHELL_PATH=${lib.getExe' pkgs.runtimeShellPackage "sh"}" ];
+                    };
                 };
 
                 defaultOverride = {
@@ -127,43 +163,6 @@
                   ) prevAttrs.patches;
                 };
 
-                # t1017, added by the ps/cat-file-remote-object-info topic (new
-                # since v2.55.0, not yet in any release), has an unquoted
-                # redirection target:
-                #
-                #     echo_without_newline "$hello_content" > $daemon_parent/hello
-                #
-                # $daemon_parent contains the trash directory path, which always
-                # has a space in it.
-                #
-                # POSIX only requires field splitting of a redirection word in
-                # interactive shells, so most shells -- including bash when it
-                # is in POSIX mode -- expand this to the single intended path.
-                # Bash invoked under its own name is *not* in POSIX mode, splits
-                # the word in two, and fails with "ambiguous redirect".
-                #
-                # t/run-test.sh runs each test with TEST_SHELL_PATH, which
-                # defaults to SHELL_PATH, so the patched shebangs are not what
-                # decides this.  Upstream's SHELL_PATH default is /bin/sh, which
-                # is POSIX mode even where /bin/sh is bash, so the bug is
-                # invisible almost everywhere.  Nixpkgs sets SHELL_PATH to
-                # stdenv.shell, i.e. .../bin/bash, so it runs the suite under
-                # non-POSIX bash and trips over it.
-                #
-                # This is still an upstream bug rather than a Nixpkgs one:
-                # config.mak.uname sets SHELL_PATH to a real bash on SunOS,
-                # IRIX, UnixWare, SCO_SV and NonStop, so a bash test suite is a
-                # configuration upstream supports.  Nothing on the list fixes it
-                # as of writing, so it needs reporting there.  Quote the
-                # redirection target here so we still get coverage of the rest
-                # of the test in the meantime.
-                fixT1017AmbiguousRedirect = prevAttrs: {
-                  postPatch = prevAttrs.postPatch or "" + ''
-                    substituteInPlace t/t1017-cat-file-remote-object-info.sh \
-                      --replace-fail '> $daemon_parent/hello' '> "$daemon_parent/hello"'
-                  '';
-                };
-
                 # Check the version in Nixpkgs matches the version in the Git
                 # maintenance branch, to avoid Nixpkgs getting ahead/behind of
                 # the Git maintenance branch I'm tracking.
@@ -198,7 +197,6 @@
                     respectRustAfterDefaultOn
                     removeUnnecessaryRustPatch
                     removeAppliedPrecomposePatch
-                    fixT1017AmbiguousRedirect
                   ];
                 };
                 gitNext = patchGit "next" gitNext {
@@ -206,7 +204,6 @@
                     respectRustAfterDefaultOn
                     removeUnnecessaryRustPatch
                     removeAppliedPrecomposePatch
-                    fixT1017AmbiguousRedirect
                   ];
                 };
                 gitMaint = patchGit "maint" gitMaint { attrOverrides = [ checkMaintVersion ]; };
