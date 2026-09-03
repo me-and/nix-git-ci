@@ -47,15 +47,22 @@
               git:
               let
                 defaultAttrOverrides = builtins.attrValues {
+                  # Build from the upstream branch we're tracking rather than
+                  # the release tarball Nixpkgs uses.  This is the whole point
+                  # of this repository, so it lives here permanently.
                   setSrc = { inherit src; };
 
-                  # Include the branch name and revision in the derivation name.
+                  # Include the branch name and revision in the derivation
+                  # name.  Permanent: this is only meaningful for this
+                  # repository's per-branch builds.
                   addName = prevAttrs: { pname = "${prevAttrs.pname}-${name}@${src.shortRev}"; };
 
                   # The passthru tests are either (a) just building the package
                   # as we already do, or (b) built using Nixpkgs' base Git
                   # package rather than the one we're creating, so aren't
                   # testing anything new.  Disable the lot of them.
+                  #
+                  # Permanent, at least in this form.
                   #
                   # TODO: Fix things so we override the tests to use the
                   # versions of Git that we're building.  That should probably
@@ -64,12 +71,6 @@
                     passthru = prevAttrs.passthru // {
                       tests = { };
                     };
-                  };
-
-                  # Set the value of debug in the installCheckPhase environment.
-                  # https://github.com/NixOS/nixpkgs/pull/537119#issuecomment-4939419503
-                  noDebugTests = prevAttrs: {
-                    installCheckFlags = prevAttrs.installCheckFlags or [ ] ++ [ "debug=" ];
                   };
 
                   # Nixpkgs builds Git from a release tarball, which ships a
@@ -126,6 +127,9 @@
                     };
                 };
 
+                # Run the test suite: Nixpkgs leaves it off by default, but
+                # running it against the tracked branches is the point of this
+                # repository, so this stays here permanently.
                 defaultOverride = {
                   doInstallCheck = true;
                 };
@@ -147,9 +151,7 @@
                 };
 
                 removeUnnecessaryRustPatch = prevAttrs: {
-                  patches = builtins.filter (
-                    p: builtins.baseNameOf p != "osxkeychain-link-rust_lib.patch"
-                  ) prevAttrs.patches;
+                  patches = builtins.filter (p: baseNameOf p != "osxkeychain-link-rust_lib.patch") prevAttrs.patches;
                 };
 
                 # The precompose_utf8 flex array fix is merged upstream as
@@ -165,7 +167,9 @@
 
                 # Check the version in Nixpkgs matches the version in the Git
                 # maintenance branch, to avoid Nixpkgs getting ahead/behind of
-                # the Git maintenance branch I'm tracking.
+                # the Git maintenance branch I'm tracking.  Permanent: this
+                # guards this repository's choice of maintenance branch, and is
+                # not something Nixpkgs would want.
                 checkMaintVersion = finalAttrs: prevAttrs: {
                   passthru = prevAttrs.passthru // {
                     tests = lib.attrsets.unionOfDisjoint prevAttrs.passthru.tests {
