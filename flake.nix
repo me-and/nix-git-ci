@@ -72,16 +72,58 @@
                     installCheckFlags = prevAttrs.installCheckFlags or [ ] ++ [ "debug=" ];
                   };
 
-                  # Disable t1517 because it's too unreliable.
-                  # https://github.com/NixOS/nixpkgs/pull/537119
-                  noT1517 = prevAttrs: {
-                    patches = builtins.filter (
-                      p: p.name or "" != "expect-gui--askyesno-failure-in-t1517.patch"
-                    ) prevAttrs.patches;
-                    preInstallCheck = prevAttrs.preInstallCheck or "" + ''
-                      rm t/t1517-outside-repo.sh
-                    '';
+                  # Nixpkgs builds Git from a release tarball, which ships a
+                  # generated `configure`; that picks up curl-config via the
+                  # `ac_cv_prog_CURL_CONFIG` configure flag Nixpkgs sets.  We
+                  # build from the Git repository, which has no `configure`, so
+                  # the Makefile instead looks for a bare `curl-config` on
+                  # PATH.  Since Nixpkgs enabled strictDeps for Git, curl's dev
+                  # output is no longer on PATH, so that lookup fails and
+                  # linking against libcurl breaks.
+                  #
+                  # Putting curl's dev output in nativeBuildInputs fixes this
+                  # for both build styles, so it's a better fix than setting
+                  # CURL_CONFIG, and is what Nixpkgs should adopt.
+                  # https://github.com/NixOS/nixpkgs/commit/a3c24cd21
+                  addCurlConfigToPath = prevAttrs: {
+                    nativeBuildInputs = prevAttrs.nativeBuildInputs or [ ] ++ [ (lib.getDev pkgs.curl) ];
                   };
+
+                  # Nixpkgs sets SHELL_PATH to stdenv.shell, which is bash
+                  # under its own name.  Upstream's default is /bin/sh, and
+                  # bash only enters POSIX mode when invoked as `sh`, so
+                  # Nixpkgs runs the test suite in a mode upstream almost never
+                  # exercises.  That's a real difference in behaviour rather
+                  # than a cosmetic one: t1017 (new since v2.55.0 via
+                  # ps/cat-file-remote-object-info) has an unquoted redirection
+                  # target,
+                  #
+                  #     echo_without_newline "$hello_content" > $daemon_parent/hello
+                  #
+                  # whose value contains the trash directory path, which always
+                  # has a space in it.  POSIX only requires field splitting of
+                  # a redirection word in interactive shells, so bash-as-`sh`
+                  # expands it to the single intended path, while bash under
+                  # its own name splits it and fails with "ambiguous
+                  # redirect", taking out 13 of t1017's 21 tests.
+                  #
+                  # (This is not about the shebangs: t/run-test.sh runs each
+                  # test under TEST_SHELL_PATH, which defaults to SHELL_PATH.)
+                  #
+                  # Point SHELL_PATH at the same shell's `sh` entrypoint, which
+                  # matches upstream's default behaviour.  Nixpkgs should adopt
+                  # this too.  Note stdenv.shell is runtimeShellPackage's bash,
+                  # not stdenv.shellPackage's -- the latter is interactive bash
+                  # on Linux, and pulling that in would be a change of shell as
+                  # well as of argv[0].
+                  useShAsShellPath =
+                    prevAttrs:
+                    lib.optionalAttrs (pkgs.stdenv.buildPlatform == pkgs.stdenv.hostPlatform) {
+                      makeFlags =
+                        builtins.filter (flag: !(lib.isString flag && lib.hasPrefix "SHELL_PATH=" flag))
+                          prevAttrs.makeFlags or [ ]
+                        ++ [ "SHELL_PATH=${lib.getExe' pkgs.runtimeShellPackage "sh"}" ];
+                    };
                 };
 
                 defaultOverride = {
@@ -107,6 +149,17 @@
                 removeUnnecessaryRustPatch = prevAttrs: {
                   patches = builtins.filter (
                     p: builtins.baseNameOf p != "osxkeychain-link-rust_lib.patch"
+                  ) prevAttrs.patches;
+                };
+
+                # The precompose_utf8 flex array fix is merged upstream as
+                # ih/precompose-flex-array, so the Nixpkgs patch no longer
+                # applies.  Drop it for branches that already have the fix;
+                # Nixpkgs should drop it when it takes the release containing
+                # the merge.
+                removeAppliedPrecomposePatch = prevAttrs: {
+                  patches = builtins.filter (
+                    p: p.name or "" != "darwin-unicode-filename-fix.patch"
                   ) prevAttrs.patches;
                 };
 
@@ -143,12 +196,14 @@
                   attrOverrides = [
                     respectRustAfterDefaultOn
                     removeUnnecessaryRustPatch
+                    removeAppliedPrecomposePatch
                   ];
                 };
                 gitNext = patchGit "next" gitNext {
                   attrOverrides = [
                     respectRustAfterDefaultOn
                     removeUnnecessaryRustPatch
+                    removeAppliedPrecomposePatch
                   ];
                 };
                 gitMaint = patchGit "maint" gitMaint { attrOverrides = [ checkMaintVersion ]; };
