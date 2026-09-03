@@ -73,14 +73,6 @@
                     };
                   };
 
-                  # Set the value of debug in the installCheckPhase
-                  # environment.  Nixpkgs should adopt this, at which point it
-                  # can be dropped from here.
-                  # https://github.com/NixOS/nixpkgs/pull/537119#issuecomment-4939419503
-                  noDebugTests = prevAttrs: {
-                    installCheckFlags = prevAttrs.installCheckFlags or [ ] ++ [ "debug=" ];
-                  };
-
                   # Nixpkgs builds Git from a release tarball, which ships a
                   # generated `configure`; that picks up curl-config via the
                   # `ac_cv_prog_CURL_CONFIG` configure flag Nixpkgs sets.  We
