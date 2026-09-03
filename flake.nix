@@ -124,6 +124,14 @@
                           prevAttrs.makeFlags or [ ]
                         ++ [ "SHELL_PATH=${lib.getExe' pkgs.runtimeShellPackage "sh"}" ];
                     };
+
+                  # Disable patching test shebangs.  As proven by the
+                  # `useShAsShellPath` override, these shebangs aren't actually
+                  # used.  This should be merged into Nixpkgs in the near
+                  # future, but it doesn't warrant a PR on its own.
+                  dontPatchTestShebangs = prevAttrs: {
+                    postPatch = builtins.replaceStrings [ "patchShebangs t/*.sh" ] [ "" ] prevAttrs.postPatch;
+                  };
                 };
 
                 defaultOverride = {
