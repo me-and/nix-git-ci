@@ -151,9 +151,7 @@
                 };
 
                 removeUnnecessaryRustPatch = prevAttrs: {
-                  patches = builtins.filter (
-                    p: builtins.baseNameOf p != "osxkeychain-link-rust_lib.patch"
-                  ) prevAttrs.patches;
+                  patches = builtins.filter (p: baseNameOf p != "osxkeychain-link-rust_lib.patch") prevAttrs.patches;
                 };
 
                 # The precompose_utf8 flex array fix is merged upstream as
