@@ -54,11 +54,11 @@
     "gitNext": {
       "flake": false,
       "locked": {
-        "lastModified": 1788464579,
-        "narHash": "sha256-aa1yEbTU3rs3/M0vMaO6875N0TMHHFkVcvg5eJpoa0c=",
+        "lastModified": 1788533555,
+        "narHash": "sha256-qgIxAvSBfiRt+C3DDle0JQpeK/pGZ+qqPuJ6GG1Ue9Q=",
         "owner": "gitster",
         "repo": "git",
-        "rev": "67a1cf3baad70b60adb589aafea2bc7badaf8ad1",
+        "rev": "73a4cd73de3e5a9f546c977afafb394d293a2882",
         "type": "github"
       },
       "original": {
