@@ -54,11 +54,11 @@
     "gitNext": {
       "flake": false,
       "locked": {
-        "lastModified": 1788798833,
-        "narHash": "sha256-8V6jg3nI5R+lqCZSrvWEBQJM9XRvNON6d90uaRj3HFw=",
+        "lastModified": 1788845270,
+        "narHash": "sha256-9wlDWaDfPSEQQTPBOTB2BHDSAkdhFiwqnW9piDQ9NGU=",
         "owner": "gitster",
         "repo": "git",
-        "rev": "20c0e7c0fb98c217fa676fa78369db4069ba6563",
+        "rev": "b21b66761940e4edbe1c73cb7a315794e62a64ac",
         "type": "github"
       },
       "original": {
@@ -70,11 +70,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1788834054,
-        "narHash": "sha256-9dzTcXMtlknZyT47Vv1PnpGgN7UYA8WxxqyxsKdvYbo=",
+        "lastModified": 1788865024,
+        "narHash": "sha256-3YkAzvtt4LoE11IcBDzPshIF3fJ0aIoILqE7dAg8CLI=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e9b9cbecbf6c25ca26c150d78570e6332694a129",
+        "rev": "422d1ae605d7fcd9896412b37dc065c456c0eefb",
         "type": "github"
       },
       "original": {
