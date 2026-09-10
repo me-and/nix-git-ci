@@ -21,11 +21,11 @@
     "gitMain": {
       "flake": false,
       "locked": {
-        "lastModified": 1788798726,
-        "narHash": "sha256-5XCx5WJ9YdRHf1xr2cq7E9vQTUQweMEWMlW9toohA7U=",
+        "lastModified": 1789043777,
+        "narHash": "sha256-Py72Yt44I4Dum8+0TbZbxU1lZv11q8HtsslbuCfw8MY=",
         "owner": "gitster",
         "repo": "git",
-        "rev": "b8242b093d9e941a34460d715e3ce616a34ac3fe",
+        "rev": "fa7f9290efe2bd22dd736689597b474b93798e11",
         "type": "github"
       },
       "original": {
@@ -54,11 +54,11 @@
     "gitNext": {
       "flake": false,
       "locked": {
-        "lastModified": 1788984002,
-        "narHash": "sha256-1Qsytk0qFlNXUvL7IrxdnY6gV/lUb7B0yvI8GhYW56U=",
+        "lastModified": 1789044150,
+        "narHash": "sha256-MScLvE0aYdMojYQEPzCcZ/E/C5LAMucsrJv2U7ibfhw=",
         "owner": "gitster",
         "repo": "git",
-        "rev": "2b9226bbc0304ab53014131a876622cff8033a51",
+        "rev": "b2e37be98936274ea8fea5e05586f048ef6640a4",
         "type": "github"
       },
       "original": {
