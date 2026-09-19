@@ -133,6 +133,28 @@
                   dontPatchTestShebangs = prevAttrs: {
                     postPatch = builtins.replaceStrings [ "patchShebangs t/*.sh" ] [ "" ] prevAttrs.postPatch;
                   };
+
+                  # Run t7450 repeatedly.  This is a temporary and
+                  # branch-specific patch to see if I can reproduce an
+                  # intermittent failure.
+                  grindT7450 = {
+                    installCheckPhase = ''
+                      runHook preInstallCheck
+
+                      (
+                        cd t
+                        for def in "''${installCheckFlags[@]}"; do
+                          n="''${def%%=*}"
+                          v="''${def#*=}"
+                          eval "export $n=''${v@Q}"
+                        done
+                        export GIT_TEST_CHAIN_LINT=0
+                        ${lib.getExe' pkgs.runtimeShellPackage "sh"} t7450-*.sh --stress-jobs=$((NIX_BUILD_CORES)) --stress-limit=1000
+                      )
+
+                      runHook postInstallCheck
+                    '';
+                  };
                 };
 
                 # Run the test suite: Nixpkgs leaves it off by default, but
