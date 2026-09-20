@@ -133,6 +133,18 @@
                   dontPatchTestShebangs = prevAttrs: {
                     postPatch = builtins.replaceStrings [ "patchShebangs t/*.sh" ] [ "" ] prevAttrs.postPatch;
                   };
+
+                  # Disable the flaky test in t7450.  This intermittent failure
+                  # seems to be caused by a race condition and isn't specific
+                  # to NixOS.  This should be merged into Nixpkgs once it has
+                  # been reported upstream.
+                  #
+                  # See also https://gist.github.com/me-and/62ae79a96845fe4593c2d1be807bc3c4
+                  disableIntermittentT7450Failure = prevAttrs: {
+                    preInstallCheck = prevAttrs.preInstallCheck or "" + ''
+                      disable_test t7450-bad-git-dotfiles "submodule git dir nesting detection must work with parallel cloning"
+                    '';
+                  };
                 };
 
                 # Run the test suite: Nixpkgs leaves it off by default, but
