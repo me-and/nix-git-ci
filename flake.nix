@@ -67,7 +67,7 @@
                   # TODO: Fix things so we override the tests to use the
                   # versions of Git that we're building.  That should probably
                   # happen in Nixpkgs rather than here.
-                  removeBuildbotTest = prevAttrs: {
+                  removePassthruTests = prevAttrs: {
                     passthru = prevAttrs.passthru // {
                       tests = { };
                     };
