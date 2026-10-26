@@ -17,7 +17,7 @@ jobs:
           token: ${{ secrets.COMMIT_PUSH_PAT }}
 
       - name: Install Nix
-        uses: cachix/install-nix-action@v31.11.2
+        uses: cachix/install-nix-action@31.11.3
         with:
           nix_path: nixpkgs=channel:nixpkgs-unstable
 
