@@ -82,12 +82,26 @@
                   # output is no longer on PATH, so that lookup fails and
                   # linking against libcurl breaks.
                   #
-                  # Putting curl's dev output in nativeBuildInputs fixes this
-                  # for both build styles, so it's a better fix than setting
-                  # CURL_CONFIG, and is what Nixpkgs should adopt.
-                  # https://github.com/NixOS/nixpkgs/commit/a3c24cd21
+                  # Fix this by building the configure script before doing
+                  # anything else.
+                  #
+                  # https://github.com/NixOS/nixpkgs/pull/570813
                   addCurlConfigToPath = prevAttrs: {
-                    nativeBuildInputs = prevAttrs.nativeBuildInputs or [ ] ++ [ (lib.getDev pkgs.curl) ];
+                    prePhases = [ "dynamicMakeFlagPhase" ];
+                    dynamicMakeFlagPhase = ''
+                      makeFlags+=( perllibdir=$out/$(perl -MConfig -wle 'print substr $Config{installsitelib}, 1 + length $Config{siteprefixexp}') )
+                    '';
+                    preConfigure = ''
+                      local flagsArray=(
+                          ''${enableParallelBuilding:+-j''${NIX_BUILD_CORES}}
+                          SHELL="$SHELL"
+                      )
+                      concatTo flagsArray makeFlags buildFlags
+                      echoCmd 'build flags' "''${flagsArray[@]}"
+                      make ''${makefile:+-f $makefile} "''${flagsArray[@]}" configure
+                    '';
+                    nativeBuildInputs = [ pkgs.autoconf ] ++ prevAttrs.nativeBuildInputs;
+                    preBuild = null;
                   };
 
                   # Nixpkgs sets SHELL_PATH to stdenv.shell, which is bash
